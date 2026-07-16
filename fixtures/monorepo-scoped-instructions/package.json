@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check packages/api/index.js",
+    "build": "node -e \"process.exit(0)\""
+  }
+}
+

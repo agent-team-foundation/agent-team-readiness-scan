@@ -1,0 +1,5 @@
+name: empty
+
+on: [push]
+
+jobs: {}

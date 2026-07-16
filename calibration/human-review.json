@@ -1,0 +1,139 @@
+{
+  "schema_version": "atr-human-review-1",
+  "reviewed_at": "2026-07-16T00:00:00.000Z",
+  "method": "Manual review of pinned repository trees and the cited deterministic evidence; bands judge repo-level multi-agent readiness, not project maturity.",
+  "repositories": [
+    {
+      "id": "first-tree",
+      "dimensions": {
+        "instruction_convergence": { "band": "strong", "evidence_note": "Root AGENTS.md provides commands, boundaries, topic reading, and one real scoped override.", "unknown_note": "Runtime loading of both instruction scopes is not statically provable." },
+        "task_workspace_isolation": { "band": "developing", "evidence_note": "Branch naming, monorepo boundaries, Docker, and a scoped QA worktree rule exist, but no root contract covers all parallel-task state.", "unknown_note": "Actual worktree, port, cache, and credential isolation remains unknown." },
+        "ownership_boundaries": { "band": "developing", "evidence_note": "CODEOWNERS is broad while AGENTS.md carries useful topic-specific boundaries and required reading.", "unknown_note": "Reviewer availability and enforcement remain unknown." },
+        "shared_decision_context": { "band": "strong", "evidence_note": "The root map, design material, required-reading contracts, and Context Tree references form a discoverable shared context surface.", "unknown_note": "Freshness and actual consultation of external Context Tree material remain unknown." },
+        "repeatable_verification": { "band": "strong", "evidence_note": "Root and package commands, extensive tests, lockfiles, CI, and setup material provide a repeatable loop.", "unknown_note": "Pinned calibration does not execute the commands." },
+        "handoff_definition": { "band": "strong", "evidence_note": "Issue and pull-request templates plus contribution guidance cover acceptance and completion evidence.", "unknown_note": "Real task and review quality remains unknown." }
+      }
+    },
+    {
+      "id": "express",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No root agent instruction source is present.", "unknown_note": "Private or runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "No repo-level parallel-task or workspace-isolation contract is visible.", "unknown_note": "Maintainer runtime practices are unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "No CODEOWNERS, OWNERS, or maintainership map is visible in the pinned tree.", "unknown_note": "Informal ownership is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "Readme and examples aid use but do not provide a durable architecture/decision surface.", "unknown_note": "Off-repo design history is unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "Package test/lint scripts and CI exist, but the repo-level clean setup contract is less explicit than exemplary repos.", "unknown_note": "Commands were detected, not executed." },
+        "handoff_definition": { "band": "constrained", "evidence_note": "No issue or pull-request handoff template is present.", "unknown_note": "Actual issue quality is unknown." }
+      }
+    },
+    {
+      "id": "flask",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No agent-specific root instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "Development environment material exists but no parallel agent task-isolation contract is visible.", "unknown_note": "Actual branch/workspace practice is unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "No path or domain ownership map is present.", "unknown_note": "Pallets maintainer routing outside the repo is unknown." },
+        "shared_decision_context": { "band": "developing", "evidence_note": "docs/design.rst records framework design rationale and module docs add navigation.", "unknown_note": "Freshness and off-repo decisions remain unknown." },
+        "repeatable_verification": { "band": "strong", "evidence_note": "Python test configuration, broad tests, CI, setup docs, and environment files provide a strong declared loop.", "unknown_note": "The calibration does not execute pytest." },
+        "handoff_definition": { "band": "developing", "evidence_note": "Structured issue and pull-request templates plus contribution guidance support handoff, though explicit acceptance prompts are limited.", "unknown_note": "Real review behavior remains unknown." }
+      }
+    },
+    {
+      "id": "requests",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No root agent instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "No observable parallel-task isolation policy or workspace boundary exists.", "unknown_note": "Actual contributor worktree practice is unknown." },
+        "ownership_boundaries": { "band": "developing", "evidence_note": "CODEOWNERS has several routing rules and contribution guidance is discoverable.", "unknown_note": "Owner currency and enforcement are unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "Readme and contributor docs navigate the project but no durable architecture or ADR surface is visible.", "unknown_note": "Historical design decisions outside the repo are unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "Make/pytest candidates, tests, CI, and setup docs exist; the canonical clean command needs confirmation.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "developing", "evidence_note": "Issue templates and contributor guidance structure task intake, but no pull-request completion template is present.", "unknown_note": "Real issue and PR quality is unknown." }
+      }
+    },
+    {
+      "id": "chi",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No agent instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "No worktree, branch, or shared-state isolation contract is visible.", "unknown_note": "Actual maintainer practice is unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "No ownership map exists; general guidance does not route domains.", "unknown_note": "Informal ownership is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "The README explains the library but no architecture/decision record is visible.", "unknown_note": "Off-repo decisions are unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "Make and Go test candidates, tests, and CI exist, with limited environment/setup proof.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "constrained", "evidence_note": "CONTRIBUTING provides some verification guidance but no task or PR template closes the handoff.", "unknown_note": "Real handoff behavior is unknown." }
+      }
+    },
+    {
+      "id": "ripgrep",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No agent-specific root instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "The Cargo workspace maps modules but no parallel-task state policy is visible.", "unknown_note": "Actual worktree and build-cache isolation is unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "No path ownership map or explicit domain review routing is present.", "unknown_note": "Informal maintainer ownership is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "Numerous crate READMEs aid navigation but do not form a durable decision surface.", "unknown_note": "Design rationale outside the repository is unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "Cargo tests, lockfile, CI, test sources, and contribution docs provide a useful but not fully canonical loop.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "constrained", "evidence_note": "Issue templates and contributing guidance exist, but no pull-request completion contract is visible.", "unknown_note": "Real review quality is unknown." }
+      }
+    },
+    {
+      "id": "axum",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No root agent instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "Cargo workspace structure exists without a parallel task/worktree policy.", "unknown_note": "Build cache and workspace isolation in practice are unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "No ownership map or explicit domain boundary is visible.", "unknown_note": "Tokio team routing outside the repository is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "Crate and example READMEs aid navigation, but no architecture or durable decision record is visible.", "unknown_note": "Off-repo design decisions are unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "Cargo tests, CI, lockfile, tests, and contributing docs form a solid declared loop without command execution proof.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "developing", "evidence_note": "Issue and pull-request templates plus CONTRIBUTING support task start and completion.", "unknown_note": "Actual acceptance quality remains unknown." }
+      }
+    },
+    {
+      "id": "fastify",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No agent-specific root instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "No parallel task/worktree or shared-state isolation contract is visible.", "unknown_note": "Actual contributor isolation is unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "GOVERNANCE describes project process but does not map code/domain paths for agent routing.", "unknown_note": "Informal domain ownership is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "README and guides support use/contribution but no durable architecture/ADR surface is visible.", "unknown_note": "Off-repo design history is unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "Package commands, extensive tests, CI, lockfile, and setup docs provide a useful declared loop.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "constrained", "evidence_note": "Contributing guidance exists without issue or pull-request templates that preserve acceptance and completion evidence.", "unknown_note": "Actual issue quality is unknown." }
+      }
+    },
+    {
+      "id": "vue-core",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No root agent instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "The pnpm workspace maps packages but does not define parallel-agent worktree/state isolation.", "unknown_note": "Actual task isolation is unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "No path ownership map is visible in the pinned tree.", "unknown_note": "Core-team ownership outside the repo is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "Package READMEs aid module navigation without a durable cross-package decision surface.", "unknown_note": "Private design discussions are unknown." },
+        "repeatable_verification": { "band": "strong", "evidence_note": "Root package commands, broad tests, CI, lockfile, and setup docs provide strong declared verification.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "developing", "evidence_note": "Structured issue intake and contribution guidance include acceptance/testing signals, though a PR template is absent.", "unknown_note": "Actual completion behavior is unknown." }
+      }
+    },
+    {
+      "id": "github-cli",
+      "dimensions": {
+        "instruction_convergence": { "band": "strong", "evidence_note": "Root AGENTS.md provides actionable commands, boundaries, and repository-specific guidance.", "unknown_note": "Runtime loading remains unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "Instructions and generated boundaries exist, but no root worktree/parallel-state isolation contract is visible.", "unknown_note": "Actual branch, port, and cache isolation is unknown." },
+        "ownership_boundaries": { "band": "developing", "evidence_note": "CODEOWNERS has meaningful path coverage and instructions add edit boundaries.", "unknown_note": "Owner availability/enforcement is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "Root/module docs aid navigation, but no architecture or durable decision location is visible.", "unknown_note": "Design proposals may live in issues and remain outside this repo-only claim." },
+        "repeatable_verification": { "band": "strong", "evidence_note": "Make/Go commands, extensive tests, CI, lockfiles, and setup docs form a strong declared loop.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "strong", "evidence_note": "Multiple issue templates, a PR template, and explicit acceptance/testing signals support self-contained handoff.", "unknown_note": "Real task quality remains unknown." }
+      }
+    },
+    {
+      "id": "uv",
+      "dimensions": {
+        "instruction_convergence": { "band": "developing", "evidence_note": "AGENTS.md/CLAUDE.md converge on behavior and required CONTRIBUTING reading, but canonical commands are delegated rather than carried at root.", "unknown_note": "Runtime loading of both files is unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "Cargo workspace and edit boundaries exist without a root parallel task/worktree/state contract.", "unknown_note": "Actual build-cache, port, and credential isolation is unknown." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "Security and generated guidance exist but no code/domain owner map is visible.", "unknown_note": "Astral team ownership outside the repo is unknown." },
+        "shared_decision_context": { "band": "developing", "evidence_note": "Agent threat-model reference plus extensive crate documentation provides some durable shared context.", "unknown_note": "Decision freshness and private planning remain unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "Tests, CI, lockfile, and contribution material are extensive, but the scanner's generic cargo/pytest commands need clean-checkout confirmation.", "unknown_note": "Commands were not executed." },
+        "handoff_definition": { "band": "strong", "evidence_note": "Structured issue and PR templates, CONTRIBUTING, and testing signals support clear handoff.", "unknown_note": "Actual review behavior remains unknown." }
+      }
+    },
+    {
+      "id": "p-map",
+      "dimensions": {
+        "instruction_convergence": { "band": "constrained", "evidence_note": "No root agent instruction source is present.", "unknown_note": "Runtime-injected instructions are unknown." },
+        "task_workspace_isolation": { "band": "constrained", "evidence_note": "No task/workspace isolation policy is present.", "unknown_note": "Solo maintainer practices are unknown and outside repo-level readiness." },
+        "ownership_boundaries": { "band": "constrained", "evidence_note": "No ownership map or edit boundary is present.", "unknown_note": "Informal ownership is unknown." },
+        "shared_decision_context": { "band": "constrained", "evidence_note": "The README documents the small library but no architecture/decision surface is present.", "unknown_note": "Off-repo rationale is unknown." },
+        "repeatable_verification": { "band": "developing", "evidence_note": "A package test command, CI, tests, and lockfile provide a minimal repeatable loop.", "unknown_note": "The command was not executed." },
+        "handoff_definition": { "band": "constrained", "evidence_note": "No issue or pull-request handoff template is present.", "unknown_note": "Actual maintainer handoff is unknown." }
+      }
+    }
+  ]
+}

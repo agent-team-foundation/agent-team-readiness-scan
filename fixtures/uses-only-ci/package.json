@@ -1,0 +1,7 @@
+{
+  "name": "uses-only-ci",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}

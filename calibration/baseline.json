@@ -1,0 +1,2046 @@
+{
+  "schema_version": "atr-calibration-results-1",
+  "generated_at": "2026-07-16T00:00:00.000Z",
+  "implementation_digest": "sha256:da5d9bed4bcbb5d16cb96a619a8ee08c4cf60d53fa6db3217a509d7abd42fd6e",
+  "input_digest": "sha256:a05b437713d0e64ea17f0d39e2c860fa22cd16ef208544fd1e0b626a2b251917",
+  "repositories": [
+    {
+      "id": "first-tree",
+      "url": "https://github.com/agent-team-foundation/first-tree",
+      "ref": "2d5bacb917c26400598563ef5500f9b4be7c5140",
+      "profile": {
+        "language": "TypeScript",
+        "size": "large",
+        "shape": "product monorepo"
+      },
+      "headline_score": 84,
+      "evidence_coverage": 99,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 10,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "AGENTS.md",
+              "line": 1,
+              "command": null,
+              "detail": "Root-scoped agent instruction source"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Root AGENTS.md provides commands, boundaries, topic reading, and one real scoped override.",
+          "human_unknown_note": "Runtime loading of both instruction scopes is not statically provable.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "AGENTS.md",
+              "line": 106,
+              "command": null,
+              "detail": "Task/workspace isolation policy"
+            },
+            {
+              "kind": "file",
+              "path": "pnpm-workspace.yaml",
+              "line": 1,
+              "command": null,
+              "detail": "Repository workspace boundary manifest"
+            },
+            {
+              "kind": "file",
+              "path": "docker-compose.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Repository-local environment isolation surface"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Branch naming, monorepo boundaries, Docker, and a scoped QA worktree rule exist, but no root contract covers all parallel-task state.",
+          "human_unknown_note": "Actual worktree, port, cache, and credential isolation remains unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 6,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/CODEOWNERS",
+              "line": 1,
+              "command": null,
+              "detail": "1 ownership rules"
+            },
+            {
+              "kind": "file",
+              "path": "AGENTS.md",
+              "line": 40,
+              "command": null,
+              "detail": "Explicit edit or scope boundary"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "CODEOWNERS is broad while AGENTS.md carries useful topic-specific boundaries and required reading.",
+          "human_unknown_note": "Reviewer availability and enforcement remain unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 8,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "packages/web/DESIGN.md",
+              "line": 1,
+              "command": null,
+              "detail": "Architecture or design context"
+            },
+            {
+              "kind": "file",
+              "path": "README.md",
+              "line": 200,
+              "command": null,
+              "detail": "Root architecture or repository-map reference"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "The root map, design material, required-reading contracts, and Context Tree references form a discoverable shared context surface.",
+          "human_unknown_note": "Freshness and actual consultation of external Context Tree material remain unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 10,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "apps/cli/package.json",
+              "line": 44,
+              "command": "pnpm --dir apps/cli test",
+              "detail": "test script declared in package manifest"
+            },
+            {
+              "kind": "command",
+              "path": "apps/cli/package.json",
+              "line": 43,
+              "command": "pnpm --dir apps/cli typecheck",
+              "detail": "typecheck script declared in package manifest"
+            },
+            {
+              "kind": "command",
+              "path": "apps/cli/package.json",
+              "line": 42,
+              "command": "pnpm --dir apps/cli build",
+              "detail": "build script declared in package manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/ci.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Root and package commands, extensive tests, lockfiles, CI, and setup material provide a repeatable loop.",
+          "human_unknown_note": "Pinned calibration does not execute the commands.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 9,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            },
+            {
+              "kind": "file",
+              "path": ".github/PULL_REQUEST_TEMPLATE.md",
+              "line": 1,
+              "command": null,
+              "detail": "Pull request completion template"
+            },
+            {
+              "kind": "file",
+              "path": "CONTRIBUTING.md",
+              "line": 65,
+              "command": null,
+              "detail": "Acceptance or definition-of-done signal"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Issue and pull-request templates plus contribution guidance cover acceptance and completion evidence.",
+          "human_unknown_note": "Real task and review quality remains unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "express",
+      "url": "https://github.com/expressjs/express",
+      "ref": "ae6dd37680e3a00618d6c8a3e522f0ee4eeba1a4",
+      "profile": {
+        "language": "JavaScript",
+        "size": "medium",
+        "shape": "web framework"
+      },
+      "headline_score": 14,
+      "evidence_coverage": 100,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No root agent instruction source is present.",
+          "human_unknown_note": "Private or runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CONTRIBUTING.md|.devcontainer/|docker-compose.yml",
+              "line": null,
+              "command": null,
+              "detail": "No repo-level task/workspace isolation contract was found"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No repo-level parallel-task or workspace-isolation contract is visible.",
+          "human_unknown_note": "Maintainer runtime practices are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/CODEOWNERS|CODEOWNERS|MAINTAINERS.md|OWNERSHIP.md",
+              "line": null,
+              "command": null,
+              "detail": "No ownership map or explicit code boundary was found"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No CODEOWNERS, OWNERS, or maintainership map is visible in the pinned tree.",
+          "human_unknown_note": "Informal ownership is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "docs/architecture.md|docs/adr/|docs/decisions/|README.md",
+              "line": null,
+              "command": null,
+              "detail": "No architecture map or durable decision record was found"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Readme and examples aid use but do not provide a durable architecture/decision surface.",
+          "human_unknown_note": "Off-repo design history is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 94,
+              "command": "npm run test",
+              "detail": "test script declared in package manifest"
+            },
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 92,
+              "command": "npm run lint",
+              "detail": "lint script declared in package manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/ci.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Package test/lint scripts and CI exist, but the repo-level clean setup contract is less explicit than exemplary repos.",
+          "human_unknown_note": "Commands were detected, not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/ISSUE_TEMPLATE/|.github/PULL_REQUEST_TEMPLATE.md|CONTRIBUTING.md",
+              "line": null,
+              "command": null,
+              "detail": "No structured task handoff or completion template was found"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No issue or pull-request handoff template is present.",
+          "human_unknown_note": "Actual issue quality is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "flask",
+      "url": "https://github.com/pallets/flask",
+      "ref": "36e4a824f340fdee7ed50937ba8e7f6bc7d17f81",
+      "profile": {
+        "language": "Python",
+        "size": "medium",
+        "shape": "web framework"
+      },
+      "headline_score": 36,
+      "evidence_coverage": 100,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No agent-specific root instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".devcontainer/devcontainer.json",
+              "line": 1,
+              "command": null,
+              "detail": "Repository-local environment isolation surface"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Development environment material exists but no parallel agent task-isolation contract is visible.",
+          "human_unknown_note": "Actual branch/workspace practice is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/CODEOWNERS|CODEOWNERS|MAINTAINERS.md|OWNERSHIP.md",
+              "line": null,
+              "command": null,
+              "detail": "No ownership map or explicit code boundary was found"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No path or domain ownership map is present.",
+          "human_unknown_note": "Pallets maintainer routing outside the repo is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 5,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "docs/design.rst",
+              "line": 1,
+              "command": null,
+              "detail": "Architecture or design context"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "docs/design.rst records framework design rationale and module docs add navigation.",
+          "human_unknown_note": "Freshness and off-repo decisions remain unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 8,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "pyproject.toml",
+              "line": 1,
+              "command": "pytest",
+              "detail": "Python test configuration"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/pre-commit.yaml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Python test configuration, broad tests, CI, setup docs, and environment files provide a strong declared loop.",
+          "human_unknown_note": "The calibration does not execute pytest.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE/bug-report.md",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            },
+            {
+              "kind": "file",
+              "path": ".github/pull_request_template.md",
+              "line": 1,
+              "command": null,
+              "detail": "Pull request completion template"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Structured issue and pull-request templates plus contribution guidance support handoff, though explicit acceptance prompts are limited.",
+          "human_unknown_note": "Real review behavior remains unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "requests",
+      "url": "https://github.com/psf/requests",
+      "ref": "f361ead047be5cb873174218582f7d8b9fcd9f49",
+      "profile": {
+        "language": "Python",
+        "size": "medium",
+        "shape": "library"
+      },
+      "headline_score": 32,
+      "evidence_coverage": 98,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No root agent instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CONTRIBUTING.md|.devcontainer/|docker-compose.yml",
+              "line": null,
+              "command": null,
+              "detail": "No repo-level task/workspace isolation contract was found"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No observable parallel-task isolation policy or workspace boundary exists.",
+          "human_unknown_note": "Actual contributor worktree practice is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 6,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/CODEOWNERS",
+              "line": 1,
+              "command": null,
+              "detail": "5 ownership rules"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "CODEOWNERS has several routing rules and contribution guidance is discoverable.",
+          "human_unknown_note": "Owner currency and enforcement are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "docs/architecture.md|docs/adr/|docs/decisions/|README.md",
+              "line": null,
+              "command": null,
+              "detail": "No architecture map or durable decision record was found"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Readme and contributor docs navigate the project but no durable architecture or ADR surface is visible.",
+          "human_unknown_note": "Historical design decisions outside the repo are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 6,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "Makefile",
+              "line": 4,
+              "command": "make test",
+              "detail": "Makefile target test"
+            },
+            {
+              "kind": "command",
+              "path": "pyproject.toml",
+              "line": 1,
+              "command": "pytest",
+              "detail": "Python test configuration"
+            },
+            {
+              "kind": "command",
+              "path": "tox.ini",
+              "line": 1,
+              "command": "tox",
+              "detail": "Python test configuration"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/close-issues.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Make/pytest candidates, tests, CI, and setup docs exist; the canonical clean command needs confirmation.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE.md",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            },
+            {
+              "kind": "file",
+              "path": "docs/dev/contributing.rst",
+              "line": 68,
+              "command": null,
+              "detail": "Acceptance or definition-of-done signal"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Issue templates and contributor guidance structure task intake, but no pull-request completion template is present.",
+          "human_unknown_note": "Real issue and PR quality is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "chi",
+      "url": "https://github.com/go-chi/chi",
+      "ref": "8b258c7bb28f97a5f2a856ff7ef962578fec9215",
+      "profile": {
+        "language": "Go",
+        "size": "small",
+        "shape": "library"
+      },
+      "headline_score": 19,
+      "evidence_coverage": 100,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No agent instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CONTRIBUTING.md|.devcontainer/|docker-compose.yml",
+              "line": null,
+              "command": null,
+              "detail": "No repo-level task/workspace isolation contract was found"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No worktree, branch, or shared-state isolation contract is visible.",
+          "human_unknown_note": "Actual maintainer practice is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/CODEOWNERS|CODEOWNERS|MAINTAINERS.md|OWNERSHIP.md",
+              "line": null,
+              "command": null,
+              "detail": "No ownership map or explicit code boundary was found"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No ownership map exists; general guidance does not route domains.",
+          "human_unknown_note": "Informal ownership is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "README.md",
+              "line": 15,
+              "command": null,
+              "detail": "Root architecture or repository-map reference"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "The README explains the library but no architecture/decision record is visible.",
+          "human_unknown_note": "Off-repo decisions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 6,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "Makefile",
+              "line": 9,
+              "command": "make test",
+              "detail": "Makefile target test"
+            },
+            {
+              "kind": "command",
+              "path": "go.mod",
+              "line": 1,
+              "command": "go test ./...",
+              "detail": "Go module declaration"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/ci.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Make and Go test candidates, tests, and CI exist, with limited environment/setup proof.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/ISSUE_TEMPLATE/|.github/PULL_REQUEST_TEMPLATE.md|CONTRIBUTING.md",
+              "line": null,
+              "command": null,
+              "detail": "No structured task handoff or completion template was found"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "CONTRIBUTING provides some verification guidance but no task or PR template closes the handoff.",
+          "human_unknown_note": "Real handoff behavior is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "ripgrep",
+      "url": "https://github.com/BurntSushi/ripgrep",
+      "ref": "5e16a5c9e57e81f6031a23faa2ace52205fa8242",
+      "profile": {
+        "language": "Rust",
+        "size": "medium",
+        "shape": "CLI application"
+      },
+      "headline_score": 26,
+      "evidence_coverage": 99,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No agent-specific root instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "Cargo.toml",
+              "line": 1,
+              "command": null,
+              "detail": "Repository workspace boundary manifest"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "The Cargo workspace maps modules but no parallel-task state policy is visible.",
+          "human_unknown_note": "Actual worktree and build-cache isolation is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/CODEOWNERS|CODEOWNERS|MAINTAINERS.md|OWNERSHIP.md",
+              "line": null,
+              "command": null,
+              "detail": "No ownership map or explicit code boundary was found"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No path ownership map or explicit domain review routing is present.",
+          "human_unknown_note": "Informal maintainer ownership is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "README.md",
+              "line": 417,
+              "command": null,
+              "detail": "Root architecture or repository-map reference"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Numerous crate READMEs aid navigation but do not form a durable decision surface.",
+          "human_unknown_note": "Design rationale outside the repository is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "Cargo.toml",
+              "line": 1,
+              "command": "cargo test",
+              "detail": "Rust package/workspace manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/ci.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Cargo tests, lockfile, CI, test sources, and contribution docs provide a useful but not fully canonical loop.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 4,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Issue templates and contributing guidance exist, but no pull-request completion contract is visible.",
+          "human_unknown_note": "Real review quality is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "axum",
+      "url": "https://github.com/tokio-rs/axum",
+      "ref": "b7e37889932edcf521ca54e5ed30245f01180994",
+      "profile": {
+        "language": "Rust",
+        "size": "medium",
+        "shape": "workspace framework"
+      },
+      "headline_score": 28,
+      "evidence_coverage": 99,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No root agent instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "Cargo.toml",
+              "line": 1,
+              "command": null,
+              "detail": "Repository workspace boundary manifest"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Cargo workspace structure exists without a parallel task/worktree policy.",
+          "human_unknown_note": "Build cache and workspace isolation in practice are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/CODEOWNERS|CODEOWNERS|MAINTAINERS.md|OWNERSHIP.md",
+              "line": null,
+              "command": null,
+              "detail": "No ownership map or explicit code boundary was found"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No ownership map or explicit domain boundary is visible.",
+          "human_unknown_note": "Tokio team routing outside the repository is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "docs/architecture.md|docs/adr/|docs/decisions/|README.md",
+              "line": null,
+              "command": null,
+              "detail": "No architecture map or durable decision record was found"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Crate and example READMEs aid navigation, but no architecture or durable decision record is visible.",
+          "human_unknown_note": "Off-repo design decisions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "Cargo.toml",
+              "line": 1,
+              "command": "cargo test",
+              "detail": "Rust package/workspace manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/CI.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Cargo tests, CI, lockfile, tests, and contributing docs form a solid declared loop without command execution proof.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            },
+            {
+              "kind": "file",
+              "path": ".github/PULL_REQUEST_TEMPLATE.md",
+              "line": 1,
+              "command": null,
+              "detail": "Pull request completion template"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Issue and pull-request templates plus CONTRIBUTING support task start and completion.",
+          "human_unknown_note": "Actual acceptance quality remains unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "fastify",
+      "url": "https://github.com/fastify/fastify",
+      "ref": "6e680c3e8150071be96cba6b30e1d74487559b54",
+      "profile": {
+        "language": "JavaScript",
+        "size": "large",
+        "shape": "web framework"
+      },
+      "headline_score": 25,
+      "evidence_coverage": 100,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No agent-specific root instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "CONTRIBUTING.md",
+              "line": 26,
+              "command": null,
+              "detail": "Task/workspace isolation policy"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No parallel task/worktree or shared-state isolation contract is visible.",
+          "human_unknown_note": "Actual contributor isolation is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 3,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "GOVERNANCE.md",
+              "line": 1,
+              "command": null,
+              "detail": "Repository ownership or governance map"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "GOVERNANCE describes project process but does not map code/domain paths for agent routing.",
+          "human_unknown_note": "Informal domain ownership is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "README.md",
+              "line": 45,
+              "command": null,
+              "detail": "Root architecture or repository-map reference"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "README and guides support use/contribution but no durable architecture/ADR surface is visible.",
+          "human_unknown_note": "Off-repo design history is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 22,
+              "command": "npm run test",
+              "detail": "test script declared in package manifest"
+            },
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 17,
+              "command": "npm run lint",
+              "detail": "lint script declared in package manifest"
+            },
+            {
+              "kind": "command",
+              "path": "test/bundler/esbuild/package.json",
+              "line": 5,
+              "command": "npm --prefix test/bundler/esbuild run test",
+              "detail": "test script declared in package manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/ci-alternative-runtime.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Package commands, extensive tests, CI, lockfile, and setup docs provide a useful declared loop.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/ISSUE_TEMPLATE/|.github/PULL_REQUEST_TEMPLATE.md|CONTRIBUTING.md",
+              "line": null,
+              "command": null,
+              "detail": "No structured task handoff or completion template was found"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Contributing guidance exists without issue or pull-request templates that preserve acceptance and completion evidence.",
+          "human_unknown_note": "Actual issue quality is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "vue-core",
+      "url": "https://github.com/vuejs/core",
+      "ref": "fa2885d8c48768d26f1666a01bd540ffe3b20f9b",
+      "profile": {
+        "language": "TypeScript",
+        "size": "large",
+        "shape": "framework monorepo"
+      },
+      "headline_score": 35,
+      "evidence_coverage": 100,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No root agent instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 3,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/contributing.md",
+              "line": 40,
+              "command": null,
+              "detail": "Task/workspace isolation policy"
+            },
+            {
+              "kind": "file",
+              "path": "pnpm-workspace.yaml",
+              "line": 1,
+              "command": null,
+              "detail": "Repository workspace boundary manifest"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "The pnpm workspace maps packages but does not define parallel-agent worktree/state isolation.",
+          "human_unknown_note": "Actual task isolation is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/CODEOWNERS|CODEOWNERS|MAINTAINERS.md|OWNERSHIP.md",
+              "line": null,
+              "command": null,
+              "detail": "No ownership map or explicit code boundary was found"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No path ownership map is visible in the pinned tree.",
+          "human_unknown_note": "Core-team ownership outside the repo is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "docs/architecture.md|docs/adr/|docs/decisions/|README.md",
+              "line": null,
+              "command": null,
+              "detail": "No architecture map or durable decision record was found"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Package READMEs aid module navigation without a durable cross-package decision surface.",
+          "human_unknown_note": "Private design discussions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 9,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 19,
+              "command": "pnpm test",
+              "detail": "test script declared in package manifest"
+            },
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 15,
+              "command": "pnpm check",
+              "detail": "check script declared in package manifest"
+            },
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 16,
+              "command": "pnpm lint",
+              "detail": "lint script declared in package manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/autofix.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Root package commands, broad tests, CI, lockfile, and setup docs provide strong declared verification.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            },
+            {
+              "kind": "file",
+              "path": ".github/contributing.md",
+              "line": 38,
+              "command": null,
+              "detail": "Acceptance or definition-of-done signal"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Structured issue intake and contribution guidance include acceptance/testing signals, though a PR template is absent.",
+          "human_unknown_note": "Actual completion behavior is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "github-cli",
+      "url": "https://github.com/cli/cli",
+      "ref": "c14cbaa24a75272958161751240fd538a68e6c04",
+      "profile": {
+        "language": "Go",
+        "size": "large",
+        "shape": "CLI application"
+      },
+      "headline_score": 64,
+      "evidence_coverage": 100,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 8,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "AGENTS.md",
+              "line": 1,
+              "command": null,
+              "detail": "Root-scoped agent instruction source"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Root AGENTS.md provides actionable commands, boundaries, and repository-specific guidance.",
+          "human_unknown_note": "Runtime loading remains unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 4,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".devcontainer/devcontainer.json",
+              "line": 1,
+              "command": null,
+              "detail": "Repository-local environment isolation surface"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Instructions and generated boundaries exist, but no root worktree/parallel-state isolation contract is visible.",
+          "human_unknown_note": "Actual branch, port, and cache isolation is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/CODEOWNERS",
+              "line": 1,
+              "command": null,
+              "detail": "12 ownership rules"
+            },
+            {
+              "kind": "file",
+              "path": "AGENTS.md",
+              "line": 7,
+              "command": null,
+              "detail": "Explicit edit or scope boundary"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "CODEOWNERS has meaningful path coverage and instructions add edit boundaries.",
+          "human_unknown_note": "Owner availability/enforcement is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 1,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "docs/architecture.md|docs/adr/|docs/decisions/|README.md",
+              "line": null,
+              "command": null,
+              "detail": "No architecture map or durable decision record was found"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Root/module docs aid navigation, but no architecture or durable decision location is visible.",
+          "human_unknown_note": "Design proposals may live in issues and remain outside this repo-only claim.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 9,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "Makefile",
+              "line": 51,
+              "command": "make test",
+              "detail": "Makefile target test"
+            },
+            {
+              "kind": "command",
+              "path": "Makefile",
+              "line": 46,
+              "command": "make lint",
+              "detail": "Makefile target lint"
+            },
+            {
+              "kind": "command",
+              "path": "go.mod",
+              "line": 1,
+              "command": "go test ./...",
+              "detail": "Go module declaration"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/bump-go.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Make/Go commands, extensive tests, CI, lockfiles, and setup docs form a strong declared loop.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 10,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            },
+            {
+              "kind": "file",
+              "path": ".github/PULL_REQUEST_TEMPLATE.md",
+              "line": 1,
+              "command": null,
+              "detail": "Pull request completion template"
+            },
+            {
+              "kind": "file",
+              "path": ".github/CONTRIBUTING.md",
+              "line": 14,
+              "command": null,
+              "detail": "Acceptance or definition-of-done signal"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Multiple issue templates, a PR template, and explicit acceptance/testing signals support self-contained handoff.",
+          "human_unknown_note": "Real task quality remains unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "uv",
+      "url": "https://github.com/astral-sh/uv",
+      "ref": "456cd2d919a2ebaeb0863b0fdbc53b3d79da1382",
+      "profile": {
+        "language": "Rust",
+        "size": "large",
+        "shape": "workspace application"
+      },
+      "headline_score": 53,
+      "evidence_coverage": 99,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 6,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "AGENTS.md",
+              "line": 1,
+              "command": null,
+              "detail": "Root-scoped agent instruction source"
+            },
+            {
+              "kind": "file",
+              "path": "CLAUDE.md",
+              "line": 1,
+              "command": null,
+              "detail": "Root-scoped agent instruction source"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "AGENTS.md/CLAUDE.md converge on behavior and required CONTRIBUTING reading, but canonical commands are delegated rather than carried at root.",
+          "human_unknown_note": "Runtime loading of both files is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 4,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "Cargo.toml",
+              "line": 1,
+              "command": null,
+              "detail": "Repository workspace boundary manifest"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Cargo workspace and edit boundaries exist without a root parallel task/worktree/state contract.",
+          "human_unknown_note": "Actual build-cache, port, and credential isolation is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 2,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "AGENTS.md",
+              "line": 6,
+              "command": null,
+              "detail": "Explicit edit or scope boundary"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "Security and generated guidance exist but no code/domain owner map is visible.",
+          "human_unknown_note": "Astral team ownership outside the repo is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 5,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": "agents/references/threat-model.md",
+              "line": 1,
+              "command": null,
+              "detail": "Architecture or design context"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Agent threat-model reference plus extensive crate documentation provides some durable shared context.",
+          "human_unknown_note": "Decision freshness and private planning remain unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 7,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "Cargo.toml",
+              "line": 1,
+              "command": "cargo test",
+              "detail": "Rust package/workspace manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/bench.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "Tests, CI, lockfile, and contribution material are extensive, but the scanner's generic cargo/pytest commands need clean-checkout confirmation.",
+          "human_unknown_note": "Commands were not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 8,
+          "machine_band": "strong",
+          "strongest_evidence": [
+            {
+              "kind": "file",
+              "path": ".github/ISSUE_TEMPLATE/1_bug_report.yaml",
+              "line": 1,
+              "command": null,
+              "detail": "Issue handoff template"
+            },
+            {
+              "kind": "file",
+              "path": ".github/PULL_REQUEST_TEMPLATE.md",
+              "line": 1,
+              "command": null,
+              "detail": "Pull request completion template"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "strong",
+          "human_evidence_note": "Structured issue and PR templates, CONTRIBUTING, and testing signals support clear handoff.",
+          "human_unknown_note": "Actual review behavior remains unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    },
+    {
+      "id": "p-map",
+      "url": "https://github.com/sindresorhus/p-map",
+      "ref": "3ada5f36632aca8df860c376856270b6d2ba2de8",
+      "profile": {
+        "language": "JavaScript",
+        "size": "small",
+        "shape": "single-package library"
+      },
+      "headline_score": 10,
+      "evidence_coverage": 100,
+      "dimensions": [
+        {
+          "key": "instruction_convergence",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CLAUDE.md|.cursor/rules/|.github/copilot-instructions.md",
+              "line": null,
+              "command": null,
+              "detail": "No root-scoped agent instruction source was found"
+            }
+          ],
+          "unknowns": [
+            "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No root agent instruction source is present.",
+          "human_unknown_note": "Runtime-injected instructions are unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "task_workspace_isolation",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "AGENTS.md|CONTRIBUTING.md|.devcontainer/|docker-compose.yml",
+              "line": null,
+              "command": null,
+              "detail": "No repo-level task/workspace isolation contract was found"
+            }
+          ],
+          "unknowns": [
+            "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No task/workspace isolation policy is present.",
+          "human_unknown_note": "Solo maintainer practices are unknown and outside repo-level readiness.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "ownership_boundaries",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/CODEOWNERS|CODEOWNERS|MAINTAINERS.md|OWNERSHIP.md",
+              "line": null,
+              "command": null,
+              "detail": "No ownership map or explicit code boundary was found"
+            }
+          ],
+          "unknowns": [
+            "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No ownership map or edit boundary is present.",
+          "human_unknown_note": "Informal ownership is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "shared_decision_context",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": "docs/architecture.md|docs/adr/|docs/decisions/|README.md",
+              "line": null,
+              "command": null,
+              "detail": "No architecture map or durable decision record was found"
+            }
+          ],
+          "unknowns": [
+            "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "The README documents the small library but no architecture/decision surface is present.",
+          "human_unknown_note": "Off-repo rationale is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "repeatable_verification",
+          "machine_score": 5,
+          "machine_band": "developing",
+          "strongest_evidence": [
+            {
+              "kind": "command",
+              "path": "package.json",
+              "line": 23,
+              "command": "npm run test",
+              "detail": "test script declared in package manifest"
+            },
+            {
+              "kind": "file",
+              "path": ".github/workflows/main.yml",
+              "line": 1,
+              "command": null,
+              "detail": "Continuous integration configuration"
+            }
+          ],
+          "unknowns": [
+            "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+          ],
+          "human_band": "developing",
+          "human_evidence_note": "A package test command, CI, tests, and lockfile provide a minimal repeatable loop.",
+          "human_unknown_note": "The command was not executed.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        },
+        {
+          "key": "handoff_definition",
+          "machine_score": 0,
+          "machine_band": "constrained",
+          "strongest_evidence": [
+            {
+              "kind": "missing",
+              "path": ".github/ISSUE_TEMPLATE/|.github/PULL_REQUEST_TEMPLATE.md|CONTRIBUTING.md",
+              "line": null,
+              "command": null,
+              "detail": "No structured task handoff or completion template was found"
+            }
+          ],
+          "unknowns": [
+            "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+          ],
+          "human_band": "constrained",
+          "human_evidence_note": "No issue or pull-request handoff template is present.",
+          "human_unknown_note": "Actual maintainer handoff is unknown.",
+          "agreement": true,
+          "difference_note": "Band agrees; evidence and unknown notes still require review"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "repository_count": 12,
+    "dimension_comparisons": 72,
+    "band_agreements": 72,
+    "band_disagreements": 0
+  }
+}

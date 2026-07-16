@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "test": "node -e \"require('node:fs').writeFileSync('package-script-executed', 'bad')\""
+  }
+}
+

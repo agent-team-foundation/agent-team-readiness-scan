@@ -1,0 +1,79 @@
+{
+  "schema_version": "atr-calibration-1",
+  "generated_at": "2026-07-16T00:00:00.000Z",
+  "repositories": [
+    {
+      "id": "first-tree",
+      "url": "https://github.com/agent-team-foundation/first-tree",
+      "ref": "2d5bacb917c26400598563ef5500f9b4be7c5140",
+      "profile": { "language": "TypeScript", "size": "large", "shape": "product monorepo" }
+    },
+    {
+      "id": "express",
+      "url": "https://github.com/expressjs/express",
+      "ref": "ae6dd37680e3a00618d6c8a3e522f0ee4eeba1a4",
+      "profile": { "language": "JavaScript", "size": "medium", "shape": "web framework" }
+    },
+    {
+      "id": "flask",
+      "url": "https://github.com/pallets/flask",
+      "ref": "36e4a824f340fdee7ed50937ba8e7f6bc7d17f81",
+      "profile": { "language": "Python", "size": "medium", "shape": "web framework" }
+    },
+    {
+      "id": "requests",
+      "url": "https://github.com/psf/requests",
+      "ref": "f361ead047be5cb873174218582f7d8b9fcd9f49",
+      "profile": { "language": "Python", "size": "medium", "shape": "library" }
+    },
+    {
+      "id": "chi",
+      "url": "https://github.com/go-chi/chi",
+      "ref": "8b258c7bb28f97a5f2a856ff7ef962578fec9215",
+      "profile": { "language": "Go", "size": "small", "shape": "library" }
+    },
+    {
+      "id": "ripgrep",
+      "url": "https://github.com/BurntSushi/ripgrep",
+      "ref": "5e16a5c9e57e81f6031a23faa2ace52205fa8242",
+      "profile": { "language": "Rust", "size": "medium", "shape": "CLI application" }
+    },
+    {
+      "id": "axum",
+      "url": "https://github.com/tokio-rs/axum",
+      "ref": "b7e37889932edcf521ca54e5ed30245f01180994",
+      "profile": { "language": "Rust", "size": "medium", "shape": "workspace framework" }
+    },
+    {
+      "id": "fastify",
+      "url": "https://github.com/fastify/fastify",
+      "ref": "6e680c3e8150071be96cba6b30e1d74487559b54",
+      "profile": { "language": "JavaScript", "size": "large", "shape": "web framework" }
+    },
+    {
+      "id": "vue-core",
+      "url": "https://github.com/vuejs/core",
+      "ref": "fa2885d8c48768d26f1666a01bd540ffe3b20f9b",
+      "profile": { "language": "TypeScript", "size": "large", "shape": "framework monorepo" }
+    },
+    {
+      "id": "github-cli",
+      "url": "https://github.com/cli/cli",
+      "ref": "c14cbaa24a75272958161751240fd538a68e6c04",
+      "profile": { "language": "Go", "size": "large", "shape": "CLI application" }
+    },
+    {
+      "id": "uv",
+      "url": "https://github.com/astral-sh/uv",
+      "ref": "456cd2d919a2ebaeb0863b0fdbc53b3d79da1382",
+      "profile": { "language": "Rust", "size": "large", "shape": "workspace application" }
+    },
+    {
+      "id": "p-map",
+      "url": "https://github.com/sindresorhus/p-map",
+      "ref": "3ada5f36632aca8df860c376856270b6d2ba2de8",
+      "profile": { "language": "JavaScript", "size": "small", "shape": "single-package library" }
+    }
+  ]
+}
+
