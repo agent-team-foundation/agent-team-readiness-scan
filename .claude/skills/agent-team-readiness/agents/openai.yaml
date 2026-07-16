@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Team Readiness"
+  short_description: "Scan repo readiness for multi-agent coding teams"
+  default_prompt: "Use $agent-team-readiness to scan this repository for evidence-backed multi-agent readiness."

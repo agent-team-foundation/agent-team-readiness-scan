@@ -1,0 +1,237 @@
+{
+  "schema_version": "atr-1",
+  "wedge": "agent-team-readiness",
+  "generated_at": "2026-07-16T00:00:00.000Z",
+  "repository": {
+    "source": "https://github.com/agent-team-foundation/first-tree",
+    "name": "agent-team-foundation/first-tree",
+    "revision": "2d5bacb917c26400598563ef5500f9b4be7c5140",
+    "worktree_state": "clean",
+    "file_count": 2080,
+    "analyzed_file_count": 2079,
+    "skipped_file_count": 1,
+    "inventory_truncated": false
+  },
+  "scope": {
+    "claim": "repo-level readiness",
+    "observable_only": true,
+    "evidence_coverage": 99,
+    "limitations": [
+      "The conclusion is limited to repository-observable readiness.",
+      "Actual concurrent workspace enforcement, organization permissions, team behavior, and private SaaS configuration remain unknown.",
+      "Detected verification commands are not executed by the default read-only scan.",
+      "Generated AGENTS.md and Context Tree materials are review drafts; the scanner never writes them into the target repository."
+    ]
+  },
+  "headline_score": 84,
+  "dimensions": [
+    {
+      "key": "instruction_convergence",
+      "name": "Instruction convergence",
+      "weight": 18,
+      "score": 10,
+      "status": "strong",
+      "evidence_status": "partial",
+      "rationale": "1 root and 1 scoped instruction sources; root has 8 commands and 8 boundary signals; 0 detected root conflicts.",
+      "strongest_evidence": [
+        {
+          "kind": "file",
+          "path": "AGENTS.md",
+          "line": 1,
+          "command": null,
+          "detail": "Root-scoped agent instruction source"
+        }
+      ],
+      "must_fix_blocker": null,
+      "minimum_improvement": "Keep one canonical root instruction source and use scoped files only for real local overrides.",
+      "unknowns": [
+        "Whether every agent runtime actually loads the discovered instruction files is not observable from the repository."
+      ]
+    },
+    {
+      "key": "task_workspace_isolation",
+      "name": "Task and workspace isolation",
+      "weight": 18,
+      "score": 7,
+      "status": "developing",
+      "evidence_status": "partial",
+      "rationale": "0 root-strong, 1 scoped-strong, 1 branch-only, and 0 unsafe isolation policy signals; 2 workspace manifests and 1 environment-isolation files.",
+      "strongest_evidence": [
+        {
+          "kind": "file",
+          "path": "AGENTS.md",
+          "line": 106,
+          "command": null,
+          "detail": "Task/workspace isolation policy"
+        },
+        {
+          "kind": "file",
+          "path": "pnpm-workspace.yaml",
+          "line": 1,
+          "command": null,
+          "detail": "Repository workspace boundary manifest"
+        },
+        {
+          "kind": "file",
+          "path": "docker-compose.yml",
+          "line": 1,
+          "command": null,
+          "detail": "Repository-local environment isolation surface"
+        }
+      ],
+      "must_fix_blocker": null,
+      "minimum_improvement": "Add explicit port, credential, cache, and generated-output boundaries to the existing branch/worktree policy.",
+      "unknowns": [
+        "Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone."
+      ]
+    },
+    {
+      "key": "ownership_boundaries",
+      "name": "Code and domain ownership",
+      "weight": 16,
+      "score": 6,
+      "status": "developing",
+      "evidence_status": "partial",
+      "rationale": "1 actionable CODEOWNERS/OWNERS files with 1 rules, 0 ownership docs, and 15 instruction boundaries.",
+      "strongest_evidence": [
+        {
+          "kind": "file",
+          "path": ".github/CODEOWNERS",
+          "line": 1,
+          "command": null,
+          "detail": "1 ownership rules"
+        },
+        {
+          "kind": "file",
+          "path": "AGENTS.md",
+          "line": 40,
+          "command": null,
+          "detail": "Explicit edit or scope boundary"
+        }
+      ],
+      "must_fix_blocker": null,
+      "minimum_improvement": "Cover any unmapped high-risk, generated, migration, and release paths without imposing blanket per-file gating.",
+      "unknowns": [
+        "Whether named owners are current, available, and required reviewers is not observable from static repository evidence."
+      ]
+    },
+    {
+      "key": "shared_decision_context",
+      "name": "Shared decisions and context",
+      "weight": 16,
+      "score": 8,
+      "status": "strong",
+      "evidence_status": "partial",
+      "rationale": "1 architecture docs, 0 decision records, 7 module docs, and 1 Context Tree signals.",
+      "strongest_evidence": [
+        {
+          "kind": "file",
+          "path": "packages/web/DESIGN.md",
+          "line": 1,
+          "command": null,
+          "detail": "Architecture or design context"
+        },
+        {
+          "kind": "file",
+          "path": "README.md",
+          "line": 200,
+          "command": null,
+          "detail": "Root architecture or repository-map reference"
+        }
+      ],
+      "must_fix_blocker": null,
+      "minimum_improvement": "Link the root module map to current decisions and retire stale implementation walkthroughs from the decision surface.",
+      "unknowns": [
+        "Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable."
+      ]
+    },
+    {
+      "key": "repeatable_verification",
+      "name": "Repeatable verification",
+      "weight": 20,
+      "score": 10,
+      "status": "strong",
+      "evidence_status": "partial",
+      "rationale": "23 canonical command candidates across 4 action types, 4 CI files, 765 test files, and 2 lockfiles.",
+      "strongest_evidence": [
+        {
+          "kind": "command",
+          "path": "apps/cli/package.json",
+          "line": 44,
+          "command": "pnpm --dir apps/cli test",
+          "detail": "test script declared in package manifest"
+        },
+        {
+          "kind": "command",
+          "path": "apps/cli/package.json",
+          "line": 43,
+          "command": "pnpm --dir apps/cli typecheck",
+          "detail": "typecheck script declared in package manifest"
+        },
+        {
+          "kind": "command",
+          "path": "apps/cli/package.json",
+          "line": 42,
+          "command": "pnpm --dir apps/cli build",
+          "detail": "build script declared in package manifest"
+        },
+        {
+          "kind": "file",
+          "path": ".github/workflows/ci.yml",
+          "line": 1,
+          "command": null,
+          "detail": "Continuous integration configuration"
+        }
+      ],
+      "must_fix_blocker": null,
+      "minimum_improvement": "Document a clean-checkout verification sequence and keep local commands identical to required CI gates.",
+      "unknowns": [
+        "The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown."
+      ]
+    },
+    {
+      "key": "handoff_definition",
+      "name": "Handoff and definition of done",
+      "weight": 12,
+      "score": 9,
+      "status": "strong",
+      "evidence_status": "partial",
+      "rationale": "2 issue templates, 1 pull request templates, 1 acceptance signals, and 0 verification signals.",
+      "strongest_evidence": [
+        {
+          "kind": "file",
+          "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+          "line": 1,
+          "command": null,
+          "detail": "Issue handoff template"
+        },
+        {
+          "kind": "file",
+          "path": ".github/PULL_REQUEST_TEMPLATE.md",
+          "line": 1,
+          "command": null,
+          "detail": "Pull request completion template"
+        },
+        {
+          "kind": "file",
+          "path": "CONTRIBUTING.md",
+          "line": 65,
+          "command": null,
+          "detail": "Acceptance or definition-of-done signal"
+        }
+      ],
+      "must_fix_blocker": null,
+      "minimum_improvement": "Keep handoff templates short but require acceptance criteria, verification evidence, risk, and unresolved unknowns.",
+      "unknowns": [
+        "The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown."
+      ]
+    }
+  ],
+  "top_3_fixes": [],
+  "artifacts": {
+    "evidence": "evidence.json",
+    "agents_draft": "AGENTS.draft.md",
+    "context_tree_seed_map": "context-tree-seed-map.md"
+  },
+  "summary": "Repo-level score 84/100 at 99% evidence coverage. Strong: Instruction convergence, Shared decisions and context, Repeatable verification, Handoff and definition of done. Constrained: none. 0 prioritized readiness fixes."
+}

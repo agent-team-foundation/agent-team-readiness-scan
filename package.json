@@ -1,0 +1,24 @@
+{
+  "name": "agent-team-readiness-scan",
+  "version": "0.1.0",
+  "description": "Evidence-first repo-level readiness scanner for multi-agent coding teams",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "bin": {
+    "atr-scan": "./bin/atr-scan.mjs"
+  },
+  "scripts": {
+    "scan": "node ./bin/atr-scan.mjs",
+    "validate": "node ./.claude/skills/agent-team-readiness/scripts/validate-report.mjs",
+    "calibrate": "node ./.claude/skills/agent-team-readiness/scripts/calibrate.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check ./bin/atr-scan.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/scan.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/calibrate.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0"
+  }
+}
