@@ -1,0 +1,7 @@
+{
+  "name": "prose-instructions",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}

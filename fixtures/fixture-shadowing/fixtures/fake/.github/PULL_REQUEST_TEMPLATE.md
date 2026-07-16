@@ -1,0 +1,3 @@
+## Verification
+
+- Fake fixture only.

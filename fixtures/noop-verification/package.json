@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "test": "true",
+    "lint": "true",
+    "build": "true"
+  }
+}
