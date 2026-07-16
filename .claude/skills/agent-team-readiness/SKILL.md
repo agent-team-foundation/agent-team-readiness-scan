@@ -99,7 +99,18 @@ collector limitation, label the discrepancy, preserve the original machine
 result, and record it as calibration feedback rather than silently rewriting
 the evidence.
 
-### 5. Present the result
+### 5. Publish only for an eligible hosted trial
+
+If the request came from the `agent-readiness` landing campaign, or the user
+explicitly asked for a hosted report, read
+[references/publishing.md](references/publishing.md) and follow its validation,
+render, JSON-first upload, honest-URL, and closing-choice gates exactly.
+
+Do not publish an ordinary local or private-repository scan. The hosted trial
+is limited to public GitHub repository URLs, and a failed upload never produces
+a speculative link.
+
+### 6. Present the result
 
 Lead with the heuristic headline score (or withheld-score reason), evidence
 coverage, and the repo-level scope. Then give one compact line per dimension
@@ -115,6 +126,12 @@ Describe the drafts accurately:
 Do not claim the repository is safe for multiple agents merely because the
 headline score is high. The report is a repo-level heuristic with explicit
 unknowns, not certification.
+
+For the hosted trial, present the confirmed seven-day report URL only after
+both publish uploads succeed, then raise the single tracked closing choice
+defined in the publishing reference. The trial agent remains read-only; a fix
+choice is a handoff to the user's own team, not permission to edit the scanned
+repository in this chat.
 
 ## Calibration and regression work
 

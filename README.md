@@ -42,6 +42,22 @@ node ./.claude/skills/agent-team-readiness/scripts/validate-report.mjs \
   /tmp/first-tree-atr/atr-1.json
 ```
 
+Render a self-contained report page:
+
+```bash
+node ./.claude/skills/agent-team-readiness/scripts/render-report.mjs \
+  /tmp/first-tree-atr/atr-1.json --out-dir /tmp/first-tree-atr
+```
+
+The renderer prints a deterministic report key and writes
+`<report-key>.html`. It validates `atr-1`, escapes all report-controlled text,
+uses no external scripts or assets, and refuses to overwrite an existing path.
+Hosted public-repository trials upload the original JSON first and the HTML
+second; a live URL is shown only when both uploads succeed. The full gated
+contract is documented in the skill's `references/publishing.md`. A
+byte-reproducible rendered example is checked in at
+[`examples/first-tree/report.html`](examples/first-tree/report.html).
+
 The default scanner never runs commands found in the target repository and
 refuses to place output inside a local target. Repository text is treated as
 untrusted evidence, not instructions. Local Git execution disables repository
@@ -55,7 +71,8 @@ The canonical skill is
 [`.claude/skills/agent-team-readiness/SKILL.md`](.claude/skills/agent-team-readiness/SKILL.md).
 It tells an agent to run deterministic collection first, then explain only what
 the evidence supports, preserve unknowns, and offer generated drafts without
-writing them into the scanned repository.
+writing them into the scanned repository. Its hosted-trial path can render and
+publish a seven-day share page while keeping the trial agent read-only.
 
 ## Development
 
