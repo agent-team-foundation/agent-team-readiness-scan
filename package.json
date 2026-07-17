@@ -16,7 +16,7 @@
     "validate": "node ./.claude/skills/agent-team-readiness/scripts/validate-report.mjs",
     "calibrate": "node ./.claude/skills/agent-team-readiness/scripts/calibrate.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check ./bin/atr-scan.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/scan.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/calibrate.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/validate-report.mjs && for f in ./.claude/skills/agent-team-readiness/scripts/lib/*.mjs; do node --check \"$f\" || exit 1; done"
+    "check": "node --check ./bin/atr-scan.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/scan.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/calibrate.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/validate-report.mjs && node --check ./.claude/skills/agent-team-readiness/scripts/render-report.mjs && for f in ./.claude/skills/agent-team-readiness/scripts/lib/*.mjs; do node --check \"$f\" || exit 1; done"
   },
   "devDependencies": {
     "ajv": "8.20.0"

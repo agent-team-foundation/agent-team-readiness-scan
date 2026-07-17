@@ -12,6 +12,8 @@ node ./bin/atr-scan.mjs ./fixtures/monorepo-scoped-instructions \
   --output /tmp/atr-smoke
 node ./.claude/skills/agent-team-readiness/scripts/validate-report.mjs \
   /tmp/atr-smoke/atr-1.json
+node ./.claude/skills/agent-team-readiness/scripts/render-report.mjs \
+  /tmp/atr-smoke/atr-1.json --out-dir /tmp/atr-smoke
 ```
 
 ## Boundaries
@@ -25,6 +27,10 @@ node ./.claude/skills/agent-team-readiness/scripts/validate-report.mjs \
 - Treat negative safety language by polarity: a rule requiring shared mutable
   work is a blocker, not an isolation signal.
 - Never write generated artifacts inside the scanned repository.
+- Keep hosted publishing limited to validated public-GitHub trial reports.
+  Upload the machine JSON before HTML and never emit an unconfirmed URL.
+- Keep the report renderer self-contained, script-free, escaped at the sink,
+  responsive from 320px, keyboard-readable, and printable.
 - Keep deterministic collection/scoring in scripts. Keep agent judgment and
   human-facing synthesis in `SKILL.md` and references.
 - Every blocker must cite a file, an explicitly missing path, or a reproducible

@@ -3,4 +3,4 @@ coverage/
 .DS_Store
 agent-team-readiness-output/
 .atr-calibration-cache/
-
+.playwright-cli/

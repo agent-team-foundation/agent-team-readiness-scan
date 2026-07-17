@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+  <title>agent-team-foundation/first-tree · Agent Team Readiness</title>
+  <style>
+    :root {
+      --canvas: #090d12;
+      --surface: #11171e;
+      --surface-raised: #171f28;
+      --line: #2b3743;
+      --text: #f4f7f9;
+      --muted: #aab5c0;
+      --soft: #d5dce2;
+      --accent: #f3ba4b;
+      --strong: #78d9a3;
+      --developing: #ffd27a;
+      --constrained: #ff9292;
+      --focus: #9dd5ff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-underline-offset: 0.18em; }
+    a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 4px; }
+    .skip-link { position: fixed; left: 16px; top: -80px; z-index: 10; padding: 12px 16px; background: var(--text); color: var(--canvas); }
+    .skip-link:focus { top: 16px; }
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+    .masthead { border-bottom: 1px solid var(--line); }
+    .masthead-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--soft); }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--accent); color: var(--accent); font-weight: 800; letter-spacing: -.04em; }
+    .scope-pill { border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+    main { padding: 64px 0 96px; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 64px; align-items: center; padding-bottom: 64px; }
+    .eyebrow { display: block; color: var(--accent); font-size: 12px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 760px; margin: 16px 0 24px; font-size: clamp(38px, 6.4vw, 78px); line-height: .98; letter-spacing: -.055em; }
+    h2 { margin-bottom: 12px; font-size: clamp(28px, 4vw, 44px); line-height: 1.08; letter-spacing: -.035em; }
+    h3 { margin-bottom: 12px; font-size: 21px; line-height: 1.2; letter-spacing: -.018em; }
+    .hero-summary { max-width: 760px; color: var(--soft); font-size: 18px; }
+    .repo-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 32px; color: var(--muted); font-size: 14px; }
+    .repo-meta strong { color: var(--text); font-weight: 650; }
+    .score-ring {
+      --score: 0;
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 210px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) calc(var(--score) * 1%), var(--line) 0);
+      flex: 0 0 auto;
+    }
+    .score-ring::before { content: ""; position: absolute; inset: 12px; border-radius: inherit; background: var(--canvas); }
+    .score-inner { position: relative; text-align: center; }
+    .score-inner strong { display: block; font-size: 64px; line-height: .9; letter-spacing: -.06em; }
+    .score-inner span { display: block; margin-top: 12px; color: var(--muted); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+    .scope-note { margin: 0 0 56px; padding: 20px 24px; border: 1px solid #584b2e; border-left: 4px solid var(--accent); background: #17150f; color: var(--soft); }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-bottom: 80px; background: var(--line); border: 1px solid var(--line); }
+    .metric { min-height: 132px; padding: 24px; background: var(--surface); }
+    .metric span { color: var(--muted); font-size: 13px; }
+    .metric strong { display: block; margin-top: 20px; font-size: 30px; line-height: 1; letter-spacing: -.03em; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 32px; }
+    .section-heading p { max-width: 560px; margin-bottom: 0; color: var(--muted); }
+    .fixes-section { margin-bottom: 88px; }
+    .fix-stack { display: grid; gap: 16px; }
+    .fix-card { display: grid; grid-template-columns: 72px 1fr; border: 1px solid var(--line); background: var(--surface); }
+    .fix-card.severity-critical { border-left: 4px solid var(--constrained); }
+    .fix-card.severity-high { border-left: 4px solid var(--developing); }
+    .fix-card.severity-medium { border-left: 4px solid var(--accent); }
+    .fix-index { padding: 24px 16px; border-right: 1px solid var(--line); color: #71808d; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+    .fix-body { padding: 24px 28px; }
+    .fix-body > p { color: var(--soft); }
+    .fix-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; color: var(--muted); font-size: 12px; text-transform: capitalize; }
+    .severity-chip { display: inline-flex; border: 1px solid currentColor; border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .severity-critical .severity-chip { color: var(--constrained); }
+    .severity-high .severity-chip { color: var(--developing); }
+    .severity-medium .severity-chip { color: var(--accent); }
+    .fix-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0 0; }
+    .fix-actions div { padding-top: 16px; border-top: 1px solid var(--line); }
+    .fix-actions dt, .improvement > span { color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .fix-actions dd { margin: 6px 0 0; color: var(--soft); }
+    .empty-fixes { padding: 28px; border: 1px solid #315643; background: #0f1b16; }
+    .empty-fixes strong { color: var(--strong); }
+    .empty-fixes p { margin: 8px 0 0; color: var(--soft); }
+    .dimension-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .dimension-card { display: flex; flex-direction: column; min-width: 0; padding: 28px; border: 1px solid var(--line); background: var(--surface); }
+    .dimension-card.status-strong { border-top: 3px solid var(--strong); }
+    .dimension-card.status-developing { border-top: 3px solid var(--developing); }
+    .dimension-card.status-constrained { border-top: 3px solid var(--constrained); }
+    .dimension-head { display: flex; justify-content: space-between; gap: 20px; align-items: start; }
+    .dimension-head .eyebrow { color: var(--muted); }
+    .dimension-head h3 { margin-top: 8px; }
+    .dimension-score { display: flex; align-items: baseline; white-space: nowrap; }
+    .dimension-score strong { font-size: 34px; line-height: 1; letter-spacing: -.04em; }
+    .dimension-score span { color: var(--muted); font-size: 13px; }
+    .status-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 20px; color: var(--muted); font-size: 12px; }
+    .status-badge { border-radius: 999px; padding: 4px 9px; background: var(--surface-raised); color: var(--text); font-weight: 750; text-transform: capitalize; }
+    .status-strong .status-badge { color: var(--strong); }
+    .status-developing .status-badge { color: var(--developing); }
+    .status-constrained .status-badge { color: var(--constrained); }
+    .rationale { min-height: 76px; color: var(--soft); }
+    .dimension-blocker, .dimension-clear { margin: 4px 0 20px; padding: 16px; background: var(--surface-raised); }
+    .dimension-blocker { border-left: 3px solid currentColor; }
+    .dimension-blocker strong { display: block; margin-top: 10px; color: var(--text); }
+    .dimension-blocker p { margin: 6px 0 0; color: var(--soft); font-size: 14px; }
+    .dimension-clear { border-left: 3px solid var(--strong); color: var(--strong); font-size: 14px; }
+    .improvement { margin-bottom: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .improvement p { margin: 7px 0 0; color: var(--soft); }
+    details { border-top: 1px solid var(--line); }
+    details + details { margin-top: 0; }
+    summary { padding: 14px 0; cursor: pointer; color: var(--soft); font-weight: 650; }
+    .evidence-list, .plain-list { display: grid; gap: 10px; margin: 0 0 18px; padding-left: 20px; }
+    .evidence-list li { color: var(--soft); }
+    .evidence-list li > * { display: block; }
+    .evidence-list span { margin-top: 4px; color: var(--muted); font-size: 13px; }
+    code { overflow-wrap: anywhere; color: var(--accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+    .limitations { margin-top: 88px; padding: 32px; border: 1px solid var(--line); background: var(--surface); }
+    .limitations h2 { font-size: 28px; }
+    .limitations ul { margin-bottom: 0; color: var(--soft); }
+    footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    footer div { display: flex; justify-content: space-between; gap: 20px; }
+    @media (max-width: 800px) {
+      .masthead-inner { min-height: 64px; }
+      .scope-pill { display: none; }
+      main { padding-top: 44px; }
+      .hero { grid-template-columns: 1fr; gap: 32px; }
+      .score-ring { width: 160px; }
+      .score-inner strong { font-size: 48px; }
+      .metric-grid, .dimension-grid { grid-template-columns: 1fr; }
+      .section-heading { display: block; }
+      .section-heading p { margin-top: 12px; }
+      .fix-actions { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .shell { width: min(100% - 24px, 1180px); }
+      main { padding-bottom: 64px; }
+      .hero { padding-bottom: 44px; }
+      .scope-note { padding: 16px; }
+      .metric { min-height: 112px; }
+      .fix-card { grid-template-columns: 1fr; }
+      .fix-index { padding: 12px 20px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .fix-body, .dimension-card { padding: 20px; }
+      .dimension-head { display: block; }
+      .dimension-score { margin-top: 10px; }
+      .rationale { min-height: 0; }
+      .limitations { padding: 22px; }
+      footer div { display: block; }
+      footer a { display: inline-block; margin-top: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      :root { --canvas: #fff; --surface: #fff; --surface-raised: #f5f6f7; --line: #c8cdd2; --text: #111; --muted: #4d5963; --soft: #27313a; }
+      body { background: #fff; color: #111; }
+      .masthead, footer { break-inside: avoid; }
+      .dimension-card, .fix-card, .limitations { break-inside: avoid; }
+      .score-ring { background: transparent; border: 8px solid var(--accent); }
+      .score-ring::before { background: #fff; }
+      details { display: block; }
+      details > * { display: block; }
+      .skip-link { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#report">Skip to report</a>
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand"><span class="brand-mark">A/1</span><span>Agent Team Readiness</span></div>
+      <span class="scope-pill">Repository-observable assessment</span>
+    </div>
+  </header>
+  <main id="report" class="shell">
+    <section class="hero" aria-labelledby="report-title">
+      <div>
+        <span class="eyebrow">atr-1 · Evidence-first scan</span>
+        <h1 id="report-title">agent-team-foundation/first-tree</h1>
+        <p class="hero-summary">Repo-level score 84/100 at 99% evidence coverage. Strong: Instruction convergence, Shared decisions and context, Repeatable verification, Handoff and definition of done. Constrained: none. 0 prioritized readiness fixes.</p>
+        <div class="repo-meta">
+          <span>Revision <strong>2d5bacb917c2</strong></span>
+          <span>Generated <strong>2026-07-16</strong></span>
+          <span>Worktree <strong>clean</strong></span>
+        </div>
+      </div>
+      <div class="score-ring" style="--score:84" role="img" aria-label="Headline score 84 out of 100">
+        <div class="score-inner"><strong>84</strong><span>repo score / 100</span></div>
+      </div>
+    </section>
+
+    <p class="scope-note"><strong>Read this score narrowly.</strong> It measures repository-level support for parallel coding agents. It does not certify runtime isolation, permissions, owner availability, or actual team behavior.</p>
+
+    <section class="metric-grid" aria-label="Scan coverage">
+      <div class="metric"><span>Evidence coverage</span><strong>99%</strong></div>
+      <div class="metric"><span>Files analyzed</span><strong>2,079</strong></div>
+      <div class="metric"><span>Top blockers</span><strong>0</strong></div>
+    </section>
+
+    <section class="fixes-section" aria-labelledby="fixes-title">
+      <div class="section-heading">
+        <div><span class="eyebrow">Prioritized work</span><h2 id="fixes-title">Top 3 readiness fixes</h2></div>
+        <p>Ranked deterministically by blocker severity, dimension weight, and the gap to a strong repository contract.</p>
+      </div>
+      <div class="fix-stack"><div class="empty-fixes"><strong>No must-fix blocker ranked in the Top 3.</strong><p>This is not certification. Runtime isolation, permissions, team behavior, and private integrations remain outside the repository-observable claim.</p></div></div>
+    </section>
+
+    <section aria-labelledby="dimensions-title">
+      <div class="section-heading">
+        <div><span class="eyebrow">Six fixed dimensions</span><h2 id="dimensions-title">Where the repository helps—or gets in the way</h2></div>
+        <p>Each dimension keeps its strongest evidence, smallest useful improvement, and unknowns separate.</p>
+      </div>
+      <div class="dimension-grid">
+    <article class="dimension-card status-strong">
+      <header class="dimension-head">
+        <div>
+          <span class="eyebrow">Dimension 1 · 18% weight</span>
+          <h3>Instruction convergence</h3>
+        </div>
+        <div class="dimension-score" aria-label="10 out of 10, strong">
+          <strong>10</strong><span>/10</span>
+        </div>
+      </header>
+      <div class="status-row">
+        <span class="status-badge">strong</span>
+        <span>partial evidence</span>
+      </div>
+      <p class="rationale">1 root and 1 scoped instruction sources; root has 8 commands and 8 boundary signals; 0 detected root conflicts.</p>
+      <div class="dimension-clear"><span aria-hidden="true">✓</span> No repository-observable blocker found</div>
+      <div class="improvement">
+        <span>Smallest useful improvement</span>
+        <p>Keep one canonical root instruction source and use scoped files only for real local overrides.</p>
+      </div>
+      <details open>
+        <summary>Strongest evidence</summary>
+        <ul class="evidence-list"><li><strong>AGENTS.md:1</strong><span>Root-scoped agent instruction source</span></li></ul>
+      </details>
+      <details>
+        <summary>What remains unknown</summary>
+        <ul class="plain-list"><li>Whether every agent runtime actually loads the discovered instruction files is not observable from the repository.</li></ul>
+      </details>
+    </article>
+    <article class="dimension-card status-developing">
+      <header class="dimension-head">
+        <div>
+          <span class="eyebrow">Dimension 2 · 18% weight</span>
+          <h3>Task and workspace isolation</h3>
+        </div>
+        <div class="dimension-score" aria-label="7 out of 10, developing">
+          <strong>7</strong><span>/10</span>
+        </div>
+      </header>
+      <div class="status-row">
+        <span class="status-badge">developing</span>
+        <span>partial evidence</span>
+      </div>
+      <p class="rationale">0 root-strong, 1 scoped-strong, 1 branch-only, and 0 unsafe isolation policy signals; 2 workspace manifests and 1 environment-isolation files.</p>
+      <div class="dimension-clear"><span aria-hidden="true">✓</span> No repository-observable blocker found</div>
+      <div class="improvement">
+        <span>Smallest useful improvement</span>
+        <p>Add explicit port, credential, cache, and generated-output boundaries to the existing branch/worktree policy.</p>
+      </div>
+      <details open>
+        <summary>Strongest evidence</summary>
+        <ul class="evidence-list"><li><strong>AGENTS.md:106</strong><span>Task/workspace isolation policy</span></li><li><strong>pnpm-workspace.yaml:1</strong><span>Repository workspace boundary manifest</span></li><li><strong>docker-compose.yml:1</strong><span>Repository-local environment isolation surface</span></li></ul>
+      </details>
+      <details>
+        <summary>What remains unknown</summary>
+        <ul class="plain-list"><li>Actual concurrent worktree, branch, credential, port, and temporary-state isolation is not observable from repository files alone.</li></ul>
+      </details>
+    </article>
+    <article class="dimension-card status-developing">
+      <header class="dimension-head">
+        <div>
+          <span class="eyebrow">Dimension 3 · 16% weight</span>
+          <h3>Code and domain ownership</h3>
+        </div>
+        <div class="dimension-score" aria-label="6 out of 10, developing">
+          <strong>6</strong><span>/10</span>
+        </div>
+      </header>
+      <div class="status-row">
+        <span class="status-badge">developing</span>
+        <span>partial evidence</span>
+      </div>
+      <p class="rationale">1 actionable CODEOWNERS/OWNERS files with 1 rules, 0 ownership docs, and 15 instruction boundaries.</p>
+      <div class="dimension-clear"><span aria-hidden="true">✓</span> No repository-observable blocker found</div>
+      <div class="improvement">
+        <span>Smallest useful improvement</span>
+        <p>Cover any unmapped high-risk, generated, migration, and release paths without imposing blanket per-file gating.</p>
+      </div>
+      <details open>
+        <summary>Strongest evidence</summary>
+        <ul class="evidence-list"><li><strong>.github/CODEOWNERS:1</strong><span>1 ownership rules</span></li><li><strong>AGENTS.md:40</strong><span>Explicit edit or scope boundary</span></li></ul>
+      </details>
+      <details>
+        <summary>What remains unknown</summary>
+        <ul class="plain-list"><li>Whether named owners are current, available, and required reviewers is not observable from static repository evidence.</li></ul>
+      </details>
+    </article>
+    <article class="dimension-card status-strong">
+      <header class="dimension-head">
+        <div>
+          <span class="eyebrow">Dimension 4 · 16% weight</span>
+          <h3>Shared decisions and context</h3>
+        </div>
+        <div class="dimension-score" aria-label="8 out of 10, strong">
+          <strong>8</strong><span>/10</span>
+        </div>
+      </header>
+      <div class="status-row">
+        <span class="status-badge">strong</span>
+        <span>partial evidence</span>
+      </div>
+      <p class="rationale">1 architecture docs, 0 decision records, 7 module docs, and 1 Context Tree signals.</p>
+      <div class="dimension-clear"><span aria-hidden="true">✓</span> No repository-observable blocker found</div>
+      <div class="improvement">
+        <span>Smallest useful improvement</span>
+        <p>Link the root module map to current decisions and retire stale implementation walkthroughs from the decision surface.</p>
+      </div>
+      <details open>
+        <summary>Strongest evidence</summary>
+        <ul class="evidence-list"><li><strong>packages/web/DESIGN.md:1</strong><span>Architecture or design context</span></li><li><strong>README.md:200</strong><span>Root architecture or repository-map reference</span></li></ul>
+      </details>
+      <details>
+        <summary>What remains unknown</summary>
+        <ul class="plain-list"><li>Whether decision material is current, routinely consulted, or backed by private shared context is not fully observable.</li></ul>
+      </details>
+    </article>
+    <article class="dimension-card status-strong">
+      <header class="dimension-head">
+        <div>
+          <span class="eyebrow">Dimension 5 · 20% weight</span>
+          <h3>Repeatable verification</h3>
+        </div>
+        <div class="dimension-score" aria-label="10 out of 10, strong">
+          <strong>10</strong><span>/10</span>
+        </div>
+      </header>
+      <div class="status-row">
+        <span class="status-badge">strong</span>
+        <span>partial evidence</span>
+      </div>
+      <p class="rationale">23 canonical command candidates across 4 action types, 4 CI files, 765 test files, and 2 lockfiles.</p>
+      <div class="dimension-clear"><span aria-hidden="true">✓</span> No repository-observable blocker found</div>
+      <div class="improvement">
+        <span>Smallest useful improvement</span>
+        <p>Document a clean-checkout verification sequence and keep local commands identical to required CI gates.</p>
+      </div>
+      <details open>
+        <summary>Strongest evidence</summary>
+        <ul class="evidence-list"><li><code>pnpm --dir apps/cli test</code><span>apps/cli/package.json:44 · test script declared in package manifest</span></li><li><code>pnpm --dir apps/cli typecheck</code><span>apps/cli/package.json:43 · typecheck script declared in package manifest</span></li><li><code>pnpm --dir apps/cli build</code><span>apps/cli/package.json:42 · build script declared in package manifest</span></li><li><strong>.github/workflows/ci.yml:1</strong><span>Continuous integration configuration</span></li></ul>
+      </details>
+      <details>
+        <summary>What remains unknown</summary>
+        <ul class="plain-list"><li>The default scan detects commands and CI configuration but does not execute target-repository commands. Runtime pass/fail remains unknown.</li></ul>
+      </details>
+    </article>
+    <article class="dimension-card status-strong">
+      <header class="dimension-head">
+        <div>
+          <span class="eyebrow">Dimension 6 · 12% weight</span>
+          <h3>Handoff and definition of done</h3>
+        </div>
+        <div class="dimension-score" aria-label="9 out of 10, strong">
+          <strong>9</strong><span>/10</span>
+        </div>
+      </header>
+      <div class="status-row">
+        <span class="status-badge">strong</span>
+        <span>partial evidence</span>
+      </div>
+      <p class="rationale">2 issue templates, 1 pull request templates, 1 acceptance signals, and 0 verification signals.</p>
+      <div class="dimension-clear"><span aria-hidden="true">✓</span> No repository-observable blocker found</div>
+      <div class="improvement">
+        <span>Smallest useful improvement</span>
+        <p>Keep handoff templates short but require acceptance criteria, verification evidence, risk, and unresolved unknowns.</p>
+      </div>
+      <details open>
+        <summary>Strongest evidence</summary>
+        <ul class="evidence-list"><li><strong>.github/ISSUE_TEMPLATE/bug_report.md:1</strong><span>Issue handoff template</span></li><li><strong>.github/PULL_REQUEST_TEMPLATE.md:1</strong><span>Pull request completion template</span></li><li><strong>CONTRIBUTING.md:65</strong><span>Acceptance or definition-of-done signal</span></li></ul>
+      </details>
+      <details>
+        <summary>What remains unknown</summary>
+        <ul class="plain-list"><li>The quality of real tasks, review conversations, and completion behavior outside repository templates remains unknown.</li></ul>
+      </details>
+    </article></div>
+    </section>
+
+    <section class="limitations" aria-labelledby="limits-title">
+      <span class="eyebrow">Scope boundary</span>
+      <h2 id="limits-title">What this scan cannot prove</h2>
+      <ul><li>The conclusion is limited to repository-observable readiness.</li><li>Actual concurrent workspace enforcement, organization permissions, team behavior, and private SaaS configuration remain unknown.</li><li>Detected verification commands are not executed by the default read-only scan.</li><li>Generated AGENTS.md and Context Tree materials are review drafts; the scanner never writes them into the target repository.</li></ul>
+    </section>
+
+    <footer>
+      <div><span>Report key: agent-team-foundation-first-tree-20260716-5cfd9236</span><a href="https://report.first-tree.ai/agent-team-foundation-first-tree-20260716-5cfd9236.json" rel="noreferrer">Open machine-readable atr-1 JSON</a></div>
+    </footer>
+  </main>
+</body>
+</html>
