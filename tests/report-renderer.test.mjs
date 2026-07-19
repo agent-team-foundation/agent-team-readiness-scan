@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -44,7 +44,7 @@ test("renderer escapes untrusted report strings and emits a self-contained acces
   report.summary = "Readiness <img src=x onerror=alert(1)> & review";
   report.dimensions[0].rationale = "Rationale </style><script>alert(2)</script>";
   report.dimensions[0].unknowns = ["Unknown <svg onload=alert(3)>"];
-  const html = renderReport(report);
+  const html = renderReport(report, { machineHref: "./atr-1.json" });
 
   assert.doesNotMatch(html, /<script>alert/);
   assert.doesNotMatch(html, /<img src=x/);
@@ -52,6 +52,23 @@ test("renderer escapes untrusted report strings and emits a self-contained acces
   assert.match(html, /&lt;img src=x onerror=alert\(1\)&gt; &amp; review/);
   assert.match(html, /Content-Security-Policy/);
   assert.match(html, /class="skip-link"/);
+  assert.match(html, /class="action-rail"/);
+  assert.match(html, /Priority findings/);
+  assert.match(html, /class="dimension-ledger"/);
+  assert.match(html, /id="must-fix"/);
+  assert.match(html, /Keep the repository contract current/);
+  assert.match(html, /No repository-observable blockers were ranked/);
+  assert.match(html, /score-lockup tone-warning/);
+  assert.doesNotMatch(html, /Share this report/);
+  assert.doesNotMatch(html, /Agent-team ready/);
+  assert.doesNotMatch(html, /Where the team breaks/);
+  assert.doesNotMatch(html, /https:\/\/(?:github\.com|first-tree\.ai|report\.first-tree\.ai)/);
+  assert.match(html, /href="\.\/[a-z0-9._-]+\.json"/);
+  assert.match(html, /role="columnheader">Priority/);
+  assert.match(html, /aria-colspan="5"/);
+  assert.match(html, /overflow-wrap: anywhere/);
+  assert.match(html, /--accent: #3f5200/);
+  assert.match(html, /--warning: #8f3f00/);
   assert.match(html, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(html, /@media print/);
   assert.match(html, /Open machine-readable atr-1 JSON/);
@@ -72,7 +89,30 @@ test("renderer writes one deterministic HTML artifact and refuses an existing de
     assert.equal(path.basename(first.outputFile), `${first.key}.html`);
     const html = await readFile(first.outputFile, "utf8");
     assert.match(html, new RegExp(first.key));
+    assert.match(html, /href="\.\/atr-1\.json"/);
     await assert.rejects(renderReportFile(reportFile, sandbox), /EEXIST/);
+  } finally {
+    await rm(sandbox, { recursive: true, force: true });
+  }
+});
+
+test("renderer never invents a local machine JSON link across directories", async () => {
+  const sandbox = await mkdtemp(path.join(os.tmpdir(), "atr-render-link-"));
+  try {
+    const reportDirectory = path.join(sandbox, "input");
+    const outputDirectory = path.join(sandbox, "output");
+    await mkdir(reportDirectory);
+    const reportFile = path.join(reportDirectory, "atr-1.json");
+    await writeFile(reportFile, `${JSON.stringify(SAMPLE)}\n`);
+    const local = await renderReportFile(reportFile, outputDirectory);
+    const localHtml = await readFile(local.outputFile, "utf8");
+    assert.doesNotMatch(localHtml, /Open machine-readable atr-1 JSON/);
+    assert.match(localHtml, /Review scan limitations/);
+
+    const hostedDirectory = path.join(sandbox, "hosted");
+    const hosted = await renderReportFile(reportFile, hostedDirectory, { hosted: true });
+    const hostedHtml = await readFile(hosted.outputFile, "utf8");
+    assert.match(hostedHtml, new RegExp(`href="\\./${hosted.key}\\.json"`));
   } finally {
     await rm(sandbox, { recursive: true, force: true });
   }
@@ -89,6 +129,9 @@ test("withheld headline scores stay visibly withheld", () => {
   const html = renderReport(report);
   assert.match(html, /score withheld/);
   assert.doesNotMatch(html, /repo score \/ 100/);
+  assert.match(html, /No must-fix chapter was generated from observed evidence/);
+  assert.doesNotMatch(html, /Evidence ledger complete/);
+  assert.doesNotMatch(html, /No must-fix chapter is required/);
 });
 
 test("scanner blockers render in their deterministic Top 3 order", async () => {
@@ -101,6 +144,12 @@ test("scanner blockers render in their deterministic Top 3 order", async () => {
     });
     assert.ok(result.report.top_3_fixes.length > 0);
     const html = renderReport(result.report);
+    assert.match(html, /score-lockup tone-danger/);
+    assert.match(html, /Review the must-fix chapters/);
+    assert.match(html, /Blocker evidence/);
+    assert.match(html, /No root-scoped agent instruction source was found/);
+    assert.match(html, /Constrained/);
+    assert.doesNotMatch(html, /Root cause/);
     let priorIndex = -1;
     for (const fix of result.report.top_3_fixes) {
       const currentIndex = html.indexOf(escapeHtml(fix.title));
@@ -132,5 +181,6 @@ test("publishing contract fails closed on GitHub visibility before rendering or 
   assert.match(contract, /if \[ "\$VISIBILITY" != "PUBLIC" \]/);
   assert.match(contract, /lookup failure, or any visibility\s+other than `PUBLIC` stops/);
   assert.ok(visibilityGate < render, "visibility must be checked before rendering");
+  assert.match(contract, /render-report\.mjs "\$OUT\/atr-1\.json" --out-dir "\$OUT" --hosted/);
   assert.ok(visibilityGate < upload, "visibility must be checked before upload");
 });

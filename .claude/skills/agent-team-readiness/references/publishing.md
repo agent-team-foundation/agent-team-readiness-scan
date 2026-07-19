@@ -64,7 +64,7 @@ if [ "$VISIBILITY" != "PUBLIC" ]; then
   exit 1
 fi
 
-KEY="$(node scripts/render-report.mjs "$OUT/atr-1.json" --out-dir "$OUT")"
+KEY="$(node scripts/render-report.mjs "$OUT/atr-1.json" --out-dir "$OUT" --hosted)"
 test -n "$KEY"
 test -f "$OUT/$KEY.html"
 ```
@@ -77,6 +77,12 @@ and a failed check must not fall through to rendering or either upload.
 The HTML is self-contained, has no script or external asset dependency, uses a
 restrictive Content Security Policy, escapes every report string, and links
 only to the matching machine-readable JSON object.
+
+`--hosted` is allowed only after the visibility gate above. It makes the HTML
+link to `./<report_key>.json`, the object name used by the JSON-first upload.
+Without `--hosted`, a same-directory local render links to the actual input
+JSON filename; a render into another directory omits the machine link rather
+than inventing a path that does not exist.
 
 ## JSON-first gated upload
 

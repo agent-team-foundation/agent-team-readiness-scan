@@ -7,8 +7,6 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { validateReport } from "./lib/validate.mjs";
 
-export const REPORT_BASE = "https://report.first-tree.ai";
-
 // Strip controls and bidirectional overrides at the rendering sink. Repository
 // names and evidence are untrusted even after the atr-1 shape is validated.
 // eslint-disable-next-line no-control-regex
@@ -102,78 +100,124 @@ function renderEvidenceList(entries) {
   return `<ul class="evidence-list">${entries.map((entry) => `<li>${evidenceLabel(entry)}</li>`).join("")}</ul>`;
 }
 
-function renderTopFix(fix, index) {
-  return `
-    <article class="fix-card severity-${escapeHtml(fix.severity, 16)}">
-      <div class="fix-index" aria-hidden="true">0${index + 1}</div>
-      <div class="fix-body">
-        <div class="fix-meta">
-          <span class="severity-chip">${escapeHtml(severityLabel(fix.severity), 16)}</span>
-          <span>${escapeHtml(fix.dimension.replaceAll("_", " "), 80)}</span>
-        </div>
-        <h3>${escapeHtml(fix.title, 240)}</h3>
-        <p>${escapeHtml(fix.why_it_matters, 800)}</p>
-        <dl class="fix-actions">
-          <div><dt>Minimum fix</dt><dd>${escapeHtml(fix.minimum_fix, 1000)}</dd></div>
-          <div><dt>Verify first</dt><dd>${escapeHtml(fix.first_verification_step, 1000)}</dd></div>
-        </dl>
-      </div>
-    </article>`;
+function dimensionTone(dimension) {
+  if (dimension.status === "constrained") return { label: "Constrained", className: "critical" };
+  if (dimension.status === "developing") return { label: "Developing", className: "high" };
+  return { label: "Strong", className: "stable" };
 }
 
-function renderDimension(dimension, index) {
-  const blocker = dimension.must_fix_blocker;
-  const blockerMarkup = blocker
-    ? `<div class="dimension-blocker severity-${escapeHtml(blocker.severity, 16)}">
-        <span class="severity-chip">${escapeHtml(severityLabel(blocker.severity), 16)} blocker</span>
-        <strong>${escapeHtml(blocker.title, 240)}</strong>
-        <p>${escapeHtml(blocker.why_it_matters, 800)}</p>
-      </div>`
-    : `<div class="dimension-clear"><span aria-hidden="true">✓</span> No repository-observable blocker found</div>`;
-
-  return `
-    <article class="dimension-card status-${escapeHtml(dimension.status, 16)}">
-      <header class="dimension-head">
-        <div>
-          <span class="eyebrow">Dimension ${index + 1} · ${dimension.weight}% weight</span>
-          <h3>${escapeHtml(dimension.name, 120)}</h3>
-        </div>
-        <div class="dimension-score" aria-label="${dimension.score} out of 10, ${escapeHtml(dimension.status, 20)}">
-          <strong>${dimension.score}</strong><span>/10</span>
-        </div>
-      </header>
-      <div class="status-row">
-        <span class="status-badge">${escapeHtml(dimension.status, 20)}</span>
-        <span>${escapeHtml(dimension.evidence_status, 20)} evidence</span>
-      </div>
-      <p class="rationale">${escapeHtml(dimension.rationale, 1000)}</p>
-      ${blockerMarkup}
-      <div class="improvement">
-        <span>Smallest useful improvement</span>
-        <p>${escapeHtml(dimension.minimum_improvement, 1000)}</p>
-      </div>
-      <details open>
-        <summary>Strongest evidence</summary>
-        ${renderEvidenceList(dimension.strongest_evidence)}
-      </details>
-      <details>
-        <summary>What remains unknown</summary>
-        <ul class="plain-list">${dimension.unknowns.map((unknown) => `<li>${escapeHtml(unknown, 1000)}</li>`).join("")}</ul>
-      </details>
-    </article>`;
+function renderDimensionRail(dimension) {
+  const tone = dimensionTone(dimension);
+  return `<div class="dimension-rail-item tone-${tone.className}">
+    <span>${escapeHtml(dimension.name, 120)}</span>
+    <strong>${dimension.score}<small>/10</small></strong>
+    <i style="--dimension-score:${dimension.score}" aria-hidden="true"></i>
+  </div>`;
 }
 
-export function renderReport(report) {
+function renderPriorityRow(fix, index) {
+  return `<div class="priority-row severity-${escapeHtml(fix.severity, 16)}" role="row">
+    <span class="priority-index" role="cell">${String(index + 1).padStart(2, "0")}</span>
+    <strong role="cell">${escapeHtml(fix.title, 240)}</strong>
+    <span role="cell">${escapeHtml(fix.dimension.replaceAll("_", " "), 80)}</span>
+    <span role="cell"><b class="severity-chip">${escapeHtml(severityLabel(fix.severity), 16)}</b></span>
+    <span role="cell">${escapeHtml(fix.why_it_matters, 360)}</span>
+  </div>`;
+}
+
+function renderDimensionDetail(dimension, className = "dimension-detail") {
+  return `<div class="${className}">
+    <section><h4>Strongest evidence</h4>${renderEvidenceList(dimension.strongest_evidence)}</section>
+    <section><h4>Smallest useful improvement</h4><p>${escapeHtml(dimension.minimum_improvement, 1000)}</p></section>
+    <section><h4>What remains unknown</h4><ul class="plain-list">${dimension.unknowns.map((unknown) => `<li>${escapeHtml(unknown, 1000)}</li>`).join("")}</ul></section>
+  </div>`;
+}
+
+function renderDimensionLedger(dimension, index) {
+  const tone = dimensionTone(dimension);
+  return `<article class="dimension-row tone-${tone.className}">
+    <div class="dimension-row-main">
+      <span class="dimension-number">${String(dimension.score).padStart(2, "0")}</span>
+      <div class="dimension-copy">
+        <h3>${escapeHtml(dimension.name, 120)}</h3>
+        <p>${escapeHtml(dimension.rationale, 1000)}</p>
+      </div>
+      <div class="dimension-evidence">
+        <span>Evidence</span>
+        <strong>${dimension.strongest_evidence.length} source${dimension.strongest_evidence.length === 1 ? "" : "s"}</strong>
+        <small>${escapeHtml(dimension.evidence_status, 20)} coverage</small>
+      </div>
+      <div class="dimension-priority">
+        <span>Status</span>
+        <b>${tone.label}</b>
+      </div>
+    </div>
+    <details>
+      <summary>Open evidence and next step</summary>
+      ${renderDimensionDetail(dimension)}
+    </details>
+    ${renderDimensionDetail(dimension, "print-dimension-detail")}
+  </article>`;
+}
+
+function renderFixChapter(fix, index) {
+  const evidence = fix.evidence ?? [];
+  return `<article class="fix-chapter severity-${escapeHtml(fix.severity, 16)}">
+    <header>
+      <span class="chapter-number">${String(index + 1).padStart(2, "0")}</span>
+      <div><span class="chapter-meta">${escapeHtml(fix.dimension.replaceAll("_", " "), 80)}</span><h3>${escapeHtml(fix.title, 240)}</h3><p>${escapeHtml(fix.why_it_matters, 800)}</p></div>
+      <b class="severity-chip">${escapeHtml(severityLabel(fix.severity), 16)}</b>
+    </header>
+    <div class="chapter-grid">
+      <section><h4>Blocker evidence</h4>${evidence.length ? renderEvidenceList(evidence) : "<p>No blocker evidence was retained.</p>"}</section>
+      <section><h4>Why it matters</h4><p>${escapeHtml(fix.why_it_matters, 1000)}</p></section>
+      <section class="chapter-fix"><h4>Minimum fix</h4><p>${escapeHtml(fix.minimum_fix, 1000)}</p></section>
+      <section><h4>Verify first</h4><p>${escapeHtml(fix.first_verification_step, 1000)}</p></section>
+    </div>
+  </article>`;
+}
+
+function validateMachineHref(machineHref) {
+  if (machineHref === null) return null;
+  if (!/^\.\/[A-Za-z0-9._~%+-]+\.json$/.test(machineHref)) {
+    throw new Error("machine JSON href must be a same-directory JSON path");
+  }
+  return machineHref;
+}
+
+export function renderReport(report, { machineHref = null } = {}) {
   validateReport(report);
   const key = computeReportKey(report);
   const score = report.headline_score;
   const scoreText = score === null ? "—" : String(score);
-  const scoreValue = score === null ? 0 : score;
   const revision = report.repository.revision ? report.repository.revision.slice(0, 12) : report.repository.worktree_state;
   const generatedDate = report.generated_at.slice(0, 10);
-  const fixes = report.top_3_fixes.length
-    ? report.top_3_fixes.map(renderTopFix).join("")
-    : `<div class="empty-fixes"><strong>No must-fix blocker ranked in the Top 3.</strong><p>This is not certification. Runtime isolation, permissions, team behavior, and private integrations remain outside the repository-observable claim.</p></div>`;
+  const verdict = score === null ? "Repository-observable score withheld" : "Repository-observable readiness";
+  const scoreTone = score === null
+    ? "neutral"
+    : report.dimensions.some((dimension) => dimension.status === "constrained")
+      ? "danger"
+      : report.dimensions.some((dimension) => dimension.status === "developing")
+        ? "warning"
+        : "stable";
+  const machineUrl = validateMachineHref(machineHref);
+  const machineAction = machineUrl
+    ? `<a href="${machineUrl}" rel="noreferrer">Open machine-readable atr-1 JSON</a>`
+    : `<a href="#limits-title">Review scan limitations</a>`;
+  const priorityRows = report.top_3_fixes.length
+    ? report.top_3_fixes.map(renderPriorityRow).join("")
+    : `<div class="priority-empty" role="row"><span role="cell" aria-colspan="5">No repository-observable blocker ranked in the Top 3.</span></div>`;
+  const fixChapters = report.top_3_fixes.length
+    ? report.top_3_fixes.map((fix, index) => renderFixChapter(fix, index)).join("")
+    : `<div class="clear-state"><strong>No must-fix chapter was generated from observed evidence.</strong><p>Review evidence coverage and remaining unknowns before treating this result as complete or as runtime certification.</p></div>`;
+  const mustFixHeading = report.top_3_fixes.length
+    ? `<div><span class="eyebrow">Must-fix chapters · Top ${report.top_3_fixes.length} blockers</span><h2 id="must-fix-title">Fix these in order</h2></div>
+        <p>Each chapter connects blocker evidence to its impact, minimum fix, and first verification step.</p>`
+    : `<div><span class="eyebrow">Observed evidence</span><h2 id="must-fix-title">No repository-observable blockers were ranked</h2></div>
+        <p>Review evidence coverage and remaining unknowns before treating repository evidence as complete or as runtime certification.</p>`;
+  const nextStep = report.top_3_fixes.length
+    ? `<aside class="cta"><div><strong>Review the must-fix chapters</strong><p>Each chapter keeps blocker evidence, impact, minimum fix, and verification together.</p></div><a href="#must-fix">Review fixes</a></aside>`
+    : `<aside class="cta"><div><strong>Keep the repository contract current</strong><p>Review evidence and unknowns whenever the repository's agent workflow changes.</p></div><a href="#dimensions-title">Review dimensions</a></aside>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -185,18 +229,18 @@ export function renderReport(report) {
   <title>${escapeHtml(report.repository.name, 180)} · Agent Team Readiness</title>
   <style>
     :root {
-      --canvas: #090d12;
-      --surface: #11171e;
-      --surface-raised: #171f28;
-      --line: #2b3743;
-      --text: #f4f7f9;
-      --muted: #aab5c0;
-      --soft: #d5dce2;
-      --accent: #f3ba4b;
-      --strong: #78d9a3;
-      --developing: #ffd27a;
-      --constrained: #ff9292;
-      --focus: #9dd5ff;
+      --canvas: #080907;
+      --surface: #0d0f0c;
+      --surface-raised: #11130f;
+      --line: #292b27;
+      --text: #f2f1eb;
+      --muted: #989b92;
+      --soft: #c9cbc3;
+      --accent: #d9ff43;
+      --warning: #ff9d31;
+      --danger: #ff4d43;
+      --stable: #b9d66b;
+      --focus: #f2f1eb;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -204,149 +248,167 @@ export function renderReport(report) {
       margin: 0;
       background: var(--canvas);
       color: var(--text);
-      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
     }
     a { color: inherit; text-underline-offset: 0.18em; }
-    a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 4px; }
+    a:focus-visible, summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
     .skip-link { position: fixed; left: 16px; top: -80px; z-index: 10; padding: 12px 16px; background: var(--text); color: var(--canvas); }
     .skip-link:focus { top: 16px; }
-    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
-    .masthead { border-bottom: 1px solid var(--line); }
-    .masthead-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-    .brand { display: flex; align-items: center; gap: 12px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--soft); }
-    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--accent); color: var(--accent); font-weight: 800; letter-spacing: -.04em; }
-    .scope-pill { border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; color: var(--muted); font-size: 13px; white-space: nowrap; }
-    main { padding: 64px 0 96px; }
-    .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 64px; align-items: center; padding-bottom: 64px; }
-    .eyebrow { display: block; color: var(--accent); font-size: 12px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+    .shell { width: min(1240px, calc(100% - 48px)); margin: 0 auto; }
+    .masthead { padding-top: 18px; }
+    .masthead-inner { min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 18px; border: 1px solid var(--line); }
+    .brand { font: 700 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.02em; }
+    .brand span { color: var(--muted); font-weight: 500; }
+    main { padding: 48px 0 96px; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .88fr); gap: 72px; align-items: start; padding: 10px 0 48px; }
+    .eyebrow { display: block; color: var(--warning); font: 750 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; }
     h1, h2, h3, p { margin-top: 0; }
-    h1 { max-width: 760px; margin: 16px 0 24px; font-size: clamp(38px, 6.4vw, 78px); line-height: .98; letter-spacing: -.055em; }
-    h2 { margin-bottom: 12px; font-size: clamp(28px, 4vw, 44px); line-height: 1.08; letter-spacing: -.035em; }
-    h3 { margin-bottom: 12px; font-size: 21px; line-height: 1.2; letter-spacing: -.018em; }
-    .hero-summary { max-width: 760px; color: var(--soft); font-size: 18px; }
-    .repo-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 32px; color: var(--muted); font-size: 14px; }
+    h1 { max-width: 720px; margin: 14px 0 28px; font: 650 clamp(28px, 4vw, 54px)/1.02 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.055em; overflow-wrap: anywhere; }
+    h2 { margin-bottom: 10px; font-size: clamp(25px, 3vw, 36px); line-height: 1.08; letter-spacing: -.035em; }
+    h3 { margin-bottom: 8px; font-size: 19px; line-height: 1.2; letter-spacing: -.02em; }
+    h4 { margin: 0 0 12px; color: var(--muted); font: 750 10px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
+    .score-lockup { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+    .score-lockup strong { color: var(--muted); font-size: clamp(72px, 10vw, 120px); line-height: .82; letter-spacing: -.08em; }
+    .score-lockup.tone-danger strong { color: var(--danger); }
+    .score-lockup.tone-warning strong { color: var(--warning); }
+    .score-lockup.tone-stable strong { color: var(--stable); }
+    .score-lockup span { font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.05em; }
+    .verdict { margin-bottom: 18px; font-size: clamp(30px, 4vw, 48px); line-height: 1; letter-spacing: -.045em; }
+    .hero-summary { max-width: 680px; color: var(--soft); font-size: 17px; }
+    .repo-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 26px; color: var(--muted); font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
     .repo-meta strong { color: var(--text); font-weight: 650; }
-    .score-ring {
-      --score: 0;
-      position: relative;
-      display: grid;
-      place-items: center;
-      width: 210px;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: conic-gradient(var(--accent) calc(var(--score) * 1%), var(--line) 0);
-      flex: 0 0 auto;
-    }
-    .score-ring::before { content: ""; position: absolute; inset: 12px; border-radius: inherit; background: var(--canvas); }
-    .score-inner { position: relative; text-align: center; }
-    .score-inner strong { display: block; font-size: 64px; line-height: .9; letter-spacing: -.06em; }
-    .score-inner span { display: block; margin-top: 12px; color: var(--muted); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
-    .scope-note { margin: 0 0 56px; padding: 20px 24px; border: 1px solid #584b2e; border-left: 4px solid var(--accent); background: #17150f; color: var(--soft); }
-    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-bottom: 80px; background: var(--line); border: 1px solid var(--line); }
-    .metric { min-height: 132px; padding: 24px; background: var(--surface); }
-    .metric span { color: var(--muted); font-size: 13px; }
-    .metric strong { display: block; margin-top: 20px; font-size: 30px; line-height: 1; letter-spacing: -.03em; }
-    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 32px; }
+    .repo-panel { border: 1px solid var(--line); }
+    .repo-card { padding: 20px; border-bottom: 1px solid var(--line); }
+    .repo-card span, .dimension-rail-title { color: var(--muted); font: 10px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
+    .repo-card strong { display: block; margin: 12px 0 5px; font: 650 17px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+    .repo-card small { color: var(--muted); }
+    .dimension-rail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 14px; padding: 20px; }
+    .dimension-rail-title { grid-column: 1 / -1; color: var(--warning); }
+    .dimension-rail-item span { display: block; min-height: 30px; color: var(--soft); font-size: 10px; line-height: 1.25; }
+    .dimension-rail-item strong { display: block; margin-top: 8px; font: 700 14px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .dimension-rail-item small { color: var(--muted); font-size: 9px; }
+    .dimension-rail-item i { display: block; height: 2px; margin-top: 8px; background: var(--line); }
+    .dimension-rail-item i::after { content: ""; display: block; width: calc(var(--dimension-score) * 10%); height: 100%; background: var(--stable); }
+    .dimension-rail-item.tone-critical i::after { background: var(--danger); }
+    .dimension-rail-item.tone-high i::after { background: var(--warning); }
+    .action-rail { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 0 56px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .action-rail a { padding: 16px; text-align: center; text-decoration: none; font-size: 14px; }
+    .action-rail a + a { border-left: 1px solid var(--line); }
+    .action-rail a.primary { color: var(--accent); }
+    .narrative { max-width: 760px; margin: 0 0 64px; }
+    .narrative p { color: var(--soft); }
+    .narrative .scope-note { margin-top: 18px; color: var(--muted); font-size: 13px; }
+    .section { margin-bottom: 76px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
     .section-heading p { max-width: 560px; margin-bottom: 0; color: var(--muted); }
-    .fixes-section { margin-bottom: 88px; }
-    .fix-stack { display: grid; gap: 16px; }
-    .fix-card { display: grid; grid-template-columns: 72px 1fr; border: 1px solid var(--line); background: var(--surface); }
-    .fix-card.severity-critical { border-left: 4px solid var(--constrained); }
-    .fix-card.severity-high { border-left: 4px solid var(--developing); }
-    .fix-card.severity-medium { border-left: 4px solid var(--accent); }
-    .fix-index { padding: 24px 16px; border-right: 1px solid var(--line); color: #71808d; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
-    .fix-body { padding: 24px 28px; }
-    .fix-body > p { color: var(--soft); }
-    .fix-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; color: var(--muted); font-size: 12px; text-transform: capitalize; }
-    .severity-chip { display: inline-flex; border: 1px solid currentColor; border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-    .severity-critical .severity-chip { color: var(--constrained); }
-    .severity-high .severity-chip { color: var(--developing); }
+    .priority-table { border-bottom: 1px solid var(--line); }
+    .priority-head, .priority-row { display: grid; grid-template-columns: 56px 1.15fr 1fr 120px 1.35fr; gap: 18px; align-items: center; padding: 15px 0; border-top: 1px solid var(--line); }
+    .priority-head { color: var(--muted); font: 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .priority-row { color: var(--soft); font-size: 13px; }
+    .priority-row strong { color: var(--text); font-size: 15px; }
+    .priority-row > *, .dimension-row-main > *, .fix-chapter > header > *, .chapter-grid > * { min-width: 0; overflow-wrap: anywhere; }
+    .priority-index, .dimension-number, .chapter-number { color: var(--danger); font: 700 24px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .severity-chip { display: inline-flex; border: 1px solid currentColor; border-radius: 999px; padding: 4px 9px; font: 800 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .severity-critical .severity-chip { color: var(--danger); }
+    .severity-high .severity-chip { color: var(--warning); }
     .severity-medium .severity-chip { color: var(--accent); }
-    .fix-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0 0; }
-    .fix-actions div { padding-top: 16px; border-top: 1px solid var(--line); }
-    .fix-actions dt, .improvement > span { color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-    .fix-actions dd { margin: 6px 0 0; color: var(--soft); }
-    .empty-fixes { padding: 28px; border: 1px solid #315643; background: #0f1b16; }
-    .empty-fixes strong { color: var(--strong); }
-    .empty-fixes p { margin: 8px 0 0; color: var(--soft); }
-    .dimension-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-    .dimension-card { display: flex; flex-direction: column; min-width: 0; padding: 28px; border: 1px solid var(--line); background: var(--surface); }
-    .dimension-card.status-strong { border-top: 3px solid var(--strong); }
-    .dimension-card.status-developing { border-top: 3px solid var(--developing); }
-    .dimension-card.status-constrained { border-top: 3px solid var(--constrained); }
-    .dimension-head { display: flex; justify-content: space-between; gap: 20px; align-items: start; }
-    .dimension-head .eyebrow { color: var(--muted); }
-    .dimension-head h3 { margin-top: 8px; }
-    .dimension-score { display: flex; align-items: baseline; white-space: nowrap; }
-    .dimension-score strong { font-size: 34px; line-height: 1; letter-spacing: -.04em; }
-    .dimension-score span { color: var(--muted); font-size: 13px; }
-    .status-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 20px; color: var(--muted); font-size: 12px; }
-    .status-badge { border-radius: 999px; padding: 4px 9px; background: var(--surface-raised); color: var(--text); font-weight: 750; text-transform: capitalize; }
-    .status-strong .status-badge { color: var(--strong); }
-    .status-developing .status-badge { color: var(--developing); }
-    .status-constrained .status-badge { color: var(--constrained); }
-    .rationale { min-height: 76px; color: var(--soft); }
-    .dimension-blocker, .dimension-clear { margin: 4px 0 20px; padding: 16px; background: var(--surface-raised); }
-    .dimension-blocker { border-left: 3px solid currentColor; }
-    .dimension-blocker strong { display: block; margin-top: 10px; color: var(--text); }
-    .dimension-blocker p { margin: 6px 0 0; color: var(--soft); font-size: 14px; }
-    .dimension-clear { border-left: 3px solid var(--strong); color: var(--strong); font-size: 14px; }
-    .improvement { margin-bottom: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
-    .improvement p { margin: 7px 0 0; color: var(--soft); }
+    .priority-empty, .clear-state { padding: 28px 0; color: var(--soft); border-top: 1px solid var(--line); }
+    .dimension-row { border-bottom: 1px solid var(--line); }
+    .dimension-row-main { display: grid; grid-template-columns: 72px 1.7fr .7fr .55fr; gap: 18px; align-items: center; padding: 18px 0; }
+    .dimension-number { font-size: 38px; }
+    .tone-high .dimension-number { color: var(--warning); }
+    .tone-stable .dimension-number { color: var(--stable); }
+    .dimension-copy p { margin: 0; color: var(--muted); font-size: 13px; }
+    .dimension-evidence span, .dimension-priority span { display: block; margin-bottom: 7px; color: var(--muted); font: 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+    .dimension-evidence strong, .dimension-evidence small { display: block; }
+    .dimension-evidence small { margin-top: 4px; color: var(--muted); }
+    .dimension-priority b { display: inline-flex; border: 1px solid currentColor; border-radius: 999px; padding: 5px 9px; color: var(--stable); font: 800 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .tone-critical .dimension-priority b { color: var(--danger); }
+    .tone-high .dimension-priority b { color: var(--warning); }
     details { border-top: 1px solid var(--line); }
-    details + details { margin-top: 0; }
-    summary { padding: 14px 0; cursor: pointer; color: var(--soft); font-weight: 650; }
+    summary { padding: 12px 0; cursor: pointer; color: var(--muted); font-size: 12px; }
+    .dimension-detail { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 28px; padding: 18px 0 26px 72px; }
+    .print-dimension-detail { display: none; }
+    .dimension-detail p, .dimension-detail li, .print-dimension-detail p, .print-dimension-detail li { color: var(--soft); font-size: 13px; }
     .evidence-list, .plain-list { display: grid; gap: 10px; margin: 0 0 18px; padding-left: 20px; }
     .evidence-list li { color: var(--soft); }
     .evidence-list li > * { display: block; }
     .evidence-list span { margin-top: 4px; color: var(--muted); font-size: 13px; }
     code { overflow-wrap: anywhere; color: var(--accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
-    .limitations { margin-top: 88px; padding: 32px; border: 1px solid var(--line); background: var(--surface); }
-    .limitations h2 { font-size: 28px; }
+    .fix-chapter { border-bottom: 1px solid var(--line); }
+    .fix-chapter > header { display: grid; grid-template-columns: 52px 1fr auto; gap: 18px; align-items: start; padding: 24px 0; }
+    .fix-chapter header p { margin: 0; color: var(--muted); font-size: 13px; }
+    .chapter-meta { display: block; margin-bottom: 7px; color: var(--warning); font: 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+    .chapter-grid { display: grid; grid-template-columns: 1.15fr .95fr 1fr .9fr; border-top: 1px solid var(--line); }
+    .chapter-grid section { min-width: 0; padding: 22px 20px 24px 0; }
+    .chapter-grid section + section { padding-left: 20px; border-left: 1px solid var(--line); }
+    .chapter-grid p, .chapter-grid li { color: var(--soft); font-size: 13px; }
+    .chapter-fix p { color: var(--accent); }
+    .limitations { margin-top: 76px; padding: 28px; border: 1px solid var(--line); }
+    .limitations h2 { font-size: 26px; }
     .limitations ul { margin-bottom: 0; color: var(--soft); }
-    footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .cta { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 64px; padding: 24px 28px; border: 1px solid #6f8522; }
+    .cta strong { display: block; color: var(--accent); font-size: 18px; }
+    .cta p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .cta a { flex: 0 0 auto; padding: 12px 18px; background: var(--accent); color: #111408; font-weight: 800; text-decoration: none; }
+    footer { margin-top: 54px; padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
     footer div { display: flex; justify-content: space-between; gap: 20px; }
-    @media (max-width: 800px) {
-      .masthead-inner { min-height: 64px; }
-      .scope-pill { display: none; }
-      main { padding-top: 44px; }
-      .hero { grid-template-columns: 1fr; gap: 32px; }
-      .score-ring { width: 160px; }
-      .score-inner strong { font-size: 48px; }
-      .metric-grid, .dimension-grid { grid-template-columns: 1fr; }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 36px; }
+      .priority-head { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+      .priority-row { grid-template-columns: 48px 1fr auto; }
+      .priority-row > :nth-child(3), .priority-row > :nth-child(5) { grid-column: 2 / -1; }
+      .dimension-row-main { grid-template-columns: 64px 1fr auto; }
+      .dimension-evidence { grid-column: 2; }
+      .dimension-priority { grid-column: 3; grid-row: 1; }
+      .dimension-detail { grid-template-columns: 1fr; padding-left: 64px; }
+      .chapter-grid { grid-template-columns: 1fr 1fr; }
+      .chapter-grid section:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
+      .chapter-grid section:nth-child(4) { border-top: 1px solid var(--line); }
+    }
+    @media (max-width: 680px) {
+      .masthead-inner { min-height: 50px; }
+      .masthead-inner > span { display: none; }
+      main { padding-top: 34px; }
+      .action-rail { grid-template-columns: 1fr; }
+      .action-rail a + a { border-left: 0; border-top: 1px solid var(--line); }
+      .dimension-rail { grid-template-columns: repeat(2, 1fr); }
       .section-heading { display: block; }
       .section-heading p { margin-top: 12px; }
-      .fix-actions { grid-template-columns: 1fr; }
+      .priority-row { grid-template-columns: 42px 1fr; }
+      .priority-row > :nth-child(4) { grid-column: 2; }
+      .dimension-row-main { grid-template-columns: 54px 1fr; }
+      .dimension-priority { grid-column: 2; grid-row: auto; }
+      .dimension-detail { padding-left: 0; }
+      .fix-chapter > header { grid-template-columns: 42px 1fr; }
+      .fix-chapter > header > .severity-chip { grid-column: 2; }
+      .chapter-grid { grid-template-columns: 1fr; }
+      .chapter-grid section, .chapter-grid section + section { padding: 18px 0; border-left: 0; border-top: 1px solid var(--line); }
+      .cta { align-items: stretch; flex-direction: column; }
+      .cta a { text-align: center; }
     }
-    @media (max-width: 480px) {
-      .shell { width: min(100% - 24px, 1180px); }
+    @media (max-width: 420px) {
+      .shell { width: min(100% - 24px, 1240px); }
       main { padding-bottom: 64px; }
-      .hero { padding-bottom: 44px; }
-      .scope-note { padding: 16px; }
-      .metric { min-height: 112px; }
-      .fix-card { grid-template-columns: 1fr; }
-      .fix-index { padding: 12px 20px; border-right: 0; border-bottom: 1px solid var(--line); }
-      .fix-body, .dimension-card { padding: 20px; }
-      .dimension-head { display: block; }
-      .dimension-score { margin-top: 10px; }
-      .rationale { min-height: 0; }
+      .hero { padding-bottom: 36px; }
       .limitations { padding: 22px; }
       footer div { display: block; }
       footer a { display: inline-block; margin-top: 10px; }
+      h1, h2, h3, a, code, strong { overflow-wrap: anywhere; }
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
     @media print {
-      :root { --canvas: #fff; --surface: #fff; --surface-raised: #f5f6f7; --line: #c8cdd2; --text: #111; --muted: #4d5963; --soft: #27313a; }
+      :root { --canvas: #fff; --surface: #fff; --surface-raised: #f5f6f1; --line: #bfc2ba; --text: #111; --muted: #4d5148; --soft: #272b23; --accent: #3f5200; --warning: #8f3f00; --danger: #9f1f17; --stable: #3f5200; --focus: #111; }
       body { background: #fff; color: #111; }
-      .masthead, footer { break-inside: avoid; }
-      .dimension-card, .fix-card, .limitations { break-inside: avoid; }
-      .score-ring { background: transparent; border: 8px solid var(--accent); }
-      .score-ring::before { background: #fff; }
-      details { display: block; }
-      details > * { display: block; }
+      .masthead, footer, .fix-chapter, .dimension-row, .limitations { break-inside: avoid; }
+      .narrative, .priority-row, .section-heading, .fix-chapter > header { break-inside: avoid; }
+      .section-heading, .fix-chapter > header { break-after: avoid-page; }
+      .action-rail, .cta { display: none; }
+      details { display: none; }
+      .print-dimension-detail { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 28px; padding: 18px 0 26px 72px; }
       .skip-link { display: none; }
     }
   </style>
@@ -355,49 +417,68 @@ export function renderReport(report) {
   <a class="skip-link" href="#report">Skip to report</a>
   <header class="masthead">
     <div class="shell masthead-inner">
-      <div class="brand"><span class="brand-mark">A/1</span><span>Agent Team Readiness</span></div>
-      <span class="scope-pill">Repository-observable assessment</span>
+      <div class="brand">first-tree <span>/ agent team readiness</span></div>
+      <span>Evidence-first repository scan</span>
     </div>
   </header>
   <main id="report" class="shell">
     <section class="hero" aria-labelledby="report-title">
       <div>
-        <span class="eyebrow">atr-1 · Evidence-first scan</span>
+        <span class="eyebrow">Agent team readiness</span>
         <h1 id="report-title">${escapeHtml(report.repository.name, 180)}</h1>
+        <div class="score-lockup tone-${scoreTone}" aria-label="Headline score ${score === null ? "withheld" : `${score} out of 100`}"><strong>${scoreText}</strong>${score === null ? "" : "<span>/100</span>"}</div>
+        <h2 class="verdict">${escapeHtml(verdict, 80)}</h2>
         <p class="hero-summary">${escapeHtml(report.summary, 1200)}</p>
         <div class="repo-meta">
           <span>Revision <strong>${escapeHtml(revision, 80)}</strong></span>
           <span>Generated <strong>${escapeHtml(generatedDate, 16)}</strong></span>
-          <span>Worktree <strong>${escapeHtml(report.repository.worktree_state, 20)}</strong></span>
+          <span>Files <strong>${report.repository.analyzed_file_count.toLocaleString("en-US")}</strong></span>
+          <span>Evidence <strong>${report.scope.evidence_coverage}%</strong></span>
         </div>
       </div>
-      <div class="score-ring" style="--score:${scoreValue}" role="img" aria-label="Headline score ${score === null ? "withheld" : `${score} out of 100`}">
-        <div class="score-inner"><strong>${scoreText}</strong><span>${score === null ? "score withheld" : "repo score / 100"}</span></div>
+      <div class="repo-panel">
+        <div class="repo-card"><span>Repository</span><strong>${escapeHtml(report.repository.name, 180)}</strong><small>${escapeHtml(report.repository.worktree_state, 20)} worktree · ${escapeHtml(revision, 80)}</small></div>
+        <div class="dimension-rail"><span class="dimension-rail-title">Six dimensions</span>${report.dimensions.map(renderDimensionRail).join("")}</div>
       </div>
     </section>
 
-    <p class="scope-note"><strong>Read this score narrowly.</strong> It measures repository-level support for parallel coding agents. It does not certify runtime isolation, permissions, owner availability, or actual team behavior.</p>
+    <nav class="action-rail" aria-label="Report actions">
+      <a href="#score-meaning">Review report scope</a>
+      <a class="primary" href="${report.top_3_fixes.length ? "#must-fix" : "#dimensions-title"}">${report.top_3_fixes.length ? `Fix top ${report.top_3_fixes.length}` : "Review six dimensions"}</a>
+      ${machineAction}
+    </nav>
 
-    <section class="metric-grid" aria-label="Scan coverage">
-      <div class="metric"><span>Evidence coverage</span><strong>${report.scope.evidence_coverage}%</strong></div>
-      <div class="metric"><span>Files analyzed</span><strong>${report.repository.analyzed_file_count.toLocaleString("en-US")}</strong></div>
-      <div class="metric"><span>Top blockers</span><strong>${report.top_3_fixes.length}</strong></div>
+    <section class="narrative" aria-labelledby="score-meaning">
+      <span class="eyebrow">What this score means</span>
+      <h2 id="score-meaning">Repository readiness, not runtime certification.</h2>
+      <p>${score === null ? "The headline score is withheld because the repository inventory is incomplete." : `${score}/100 reflects repository-observable support across six fixed dimensions for parallel coding agents.`} ${report.top_3_fixes.length ? "Start with the highest-priority blockers below, then use the evidence ledger to understand what remains unknown." : "Use the evidence ledger to review the repository contract and what remains unknown."}</p>
+      <p class="scope-note">This scan does not certify runtime isolation, permissions, owner availability, actual team behavior, or private integrations.</p>
     </section>
 
-    <section class="fixes-section" aria-labelledby="fixes-title">
+    <section class="section" aria-labelledby="breaks-title">
       <div class="section-heading">
-        <div><span class="eyebrow">Prioritized work</span><h2 id="fixes-title">Top 3 readiness fixes</h2></div>
-        <p>Ranked deterministically by blocker severity, dimension weight, and the gap to a strong repository contract.</p>
+        <div><span class="eyebrow">Where repository support is weakest</span><h2 id="breaks-title">Highest-priority repository blockers</h2></div>
+        <p>Ranked by blocker severity, dimension weight, and evidence gap.</p>
       </div>
-      <div class="fix-stack">${fixes}</div>
+      <div class="priority-table" role="table" aria-label="Priority findings">
+        <div class="priority-head" role="row"><span role="columnheader">Priority</span><span role="columnheader">Blocker</span><span role="columnheader">Dimension</span><span role="columnheader">Severity</span><span role="columnheader">Impact</span></div>
+        ${priorityRows}
+      </div>
     </section>
 
-    <section aria-labelledby="dimensions-title">
+    <section class="section" aria-labelledby="dimensions-title">
       <div class="section-heading">
-        <div><span class="eyebrow">Six fixed dimensions</span><h2 id="dimensions-title">Where the repository helps—or gets in the way</h2></div>
-        <p>Each dimension keeps its strongest evidence, smallest useful improvement, and unknowns separate.</p>
+        <div><span class="eyebrow">Six dimensions · Full results</span><h2 id="dimensions-title">The repository contract, line by line</h2></div>
+        <p>Every score keeps its evidence, next useful improvement, and unknowns available.</p>
       </div>
-      <div class="dimension-grid">${report.dimensions.map(renderDimension).join("")}</div>
+      <div class="dimension-ledger">${report.dimensions.map(renderDimensionLedger).join("")}</div>
+    </section>
+
+    <section id="must-fix" class="section" aria-labelledby="must-fix-title">
+      <div class="section-heading">
+        ${mustFixHeading}
+      </div>
+      ${fixChapters}
     </section>
 
     <section class="limitations" aria-labelledby="limits-title">
@@ -406,8 +487,10 @@ export function renderReport(report) {
       <ul>${report.scope.limitations.map((limitation) => `<li>${escapeHtml(limitation, 1000)}</li>`).join("")}</ul>
     </section>
 
+    ${nextStep}
+
     <footer>
-      <div><span>Report key: ${escapeHtml(key, 140)}</span><a href="${REPORT_BASE}/${escapeHtml(key, 140)}.json" rel="noreferrer">Open machine-readable atr-1 JSON</a></div>
+      <div><span>first-tree · Agent Team Readiness</span><span>Report key: ${escapeHtml(key, 140)}</span></div>
     </footer>
   </main>
 </body>
@@ -415,18 +498,21 @@ export function renderReport(report) {
 }
 
 function usage() {
-  return "Usage: render-report.mjs <atr-1.json> [--out-dir <directory>]";
+  return "Usage: render-report.mjs <atr-1.json> [--out-dir <directory>] [--hosted]";
 }
 
 function parseArgs(argv) {
   if (argv.includes("--help") || argv.includes("-h")) return { help: true };
   let reportFile = null;
   let outputDirectory = null;
+  let hosted = false;
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--out-dir") {
       outputDirectory = argv[++index];
       if (!outputDirectory) throw new Error("--out-dir requires a directory");
+    } else if (argument === "--hosted") {
+      hosted = true;
     } else if (argument.startsWith("-")) {
       throw new Error(`unknown option: ${argument}`);
     } else if (reportFile === null) {
@@ -436,17 +522,23 @@ function parseArgs(argv) {
     }
   }
   if (!reportFile) throw new Error("atr-1.json path is required");
-  return { reportFile: path.resolve(reportFile), outputDirectory };
+  return { reportFile: path.resolve(reportFile), outputDirectory, hosted };
 }
 
-export async function renderReportFile(reportFile, outputDirectory = null) {
+export async function renderReportFile(reportFile, outputDirectory = null, { hosted = false } = {}) {
   const report = JSON.parse(await readFile(reportFile, "utf8"));
   validateReport(report);
   const key = computeReportKey(report);
   const directory = path.resolve(outputDirectory ?? path.dirname(reportFile));
   await mkdir(directory, { recursive: true });
   const outputFile = path.join(directory, `${key}.html`);
-  await writeFile(outputFile, renderReport(report), { encoding: "utf8", flag: "wx", mode: 0o600 });
+  const sameDirectory = path.dirname(path.resolve(reportFile)) === directory;
+  const machineHref = hosted
+    ? `./${key}.json`
+    : sameDirectory
+      ? `./${encodeURIComponent(path.basename(reportFile))}`
+      : null;
+  await writeFile(outputFile, renderReport(report, { machineHref }), { encoding: "utf8", flag: "wx", mode: 0o600 });
   return { key, outputFile };
 }
 
@@ -457,7 +549,7 @@ export async function runCli(argv) {
       process.stdout.write(`${usage()}\n`);
       return;
     }
-    const result = await renderReportFile(options.reportFile, options.outputDirectory);
+    const result = await renderReportFile(options.reportFile, options.outputDirectory, { hosted: options.hosted });
     process.stdout.write(`${result.key}\n`);
   } catch (error) {
     process.stderr.write(`atr-render: ${error.message}\n`);
